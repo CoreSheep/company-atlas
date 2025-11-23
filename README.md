@@ -1,16 +1,43 @@
+<div align="center">
+
+<img src="website/assets/favicon.svg" alt="Company Atlas Logo" width="100" height="100" style="transform: rotate(180deg);">
+
 # Company Atlas
 
-A unified firmographic data platform with thousands of companies from open-source datasets.
+**A unified firmographic data platform with thousands of companies from open-source datasets**
 
-🌐 **Live Website**: [https://coresheep.github.io/company-atlas/](https://coresheep.github.io/company-atlas/)
+[![Website](https://img.shields.io/badge/Website-Live-brightgreen?style=for-the-badge&logo=github)](https://coresheep.github.io/company-atlas/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+[![Author](https://img.shields.io/badge/Author-Jiufeng%20Li-FF6B6B?style=for-the-badge)](https://jiufengblog.web.app/)
+
+[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![dbt](https://img.shields.io/badge/dbt-FF694B?style=for-the-badge&logo=dbt&logoColor=white)](https://www.getdbt.com/)
+[![Apache Airflow](https://img.shields.io/badge/Airflow-017CEE?style=for-the-badge&logo=apacheairflow&logoColor=white)](https://airflow.apache.org/)
+[![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
+[![Snowflake](https://img.shields.io/badge/Snowflake-29B5E8?style=for-the-badge&logo=snowflake&logoColor=white)](https://www.snowflake.com/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge&logo=github&logoColor=white)](https://pages.github.com/)
+
+**Author**: [Jiufeng Li](https://jiufengblog.web.app/) • **Year**: 2025
 
 ![Company Atlas Main Page](images/company-atlas-main.png)
 
-## Overview
+</div>
+
+## 📋 Overview
 
 Company Atlas collects, cleans, and normalizes firmographic data from multiple sources, producing an analytics-ready dataset with thousands of companies worldwide. The platform features an elegant interactive website, live dashboards, and a comprehensive REST API for data access.
 
-## Architecture
+### Key Highlights
+
+- 🎯 **Multi-Source Data**: Combines Kaggle Fortune 1000 dataset with web crawler enrichment
+- 🔄 **Automated Pipeline**: End-to-end data processing with Airflow orchestration
+- ✅ **Data Quality**: Comprehensive validation with dbt tests and Great Expectations
+- 📊 **Interactive Dashboards**: Real-time visualizations and company profiles
+- 🌐 **REST API**: FastAPI-based API with interactive documentation
+- 🚀 **Production Ready**: Deployed on GitHub Pages with CI/CD automation
+
+## 🏗️ Architecture
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌──────────┐     ┌──────────┐
@@ -27,7 +54,7 @@ Company Atlas collects, cleans, and normalizes firmographic data from multiple s
 └─────────────┘     └─────────────┘     └──────────┘     └──────────┘
 ```
 
-## Features
+## ✨ Features
 
 ### 📊 Statistics Dashboard
 
@@ -78,7 +105,7 @@ FastAPI-based RESTful API with comprehensive endpoints:
 
 **Interactive Documentation**: Available at `/docs` endpoint with Swagger UI
 
-## Data Pipelines
+## 🔄 Data Pipelines
 
 ### 1. Data Collection
 
@@ -145,7 +172,7 @@ FastAPI-based RESTful API with comprehensive endpoints:
 - Interactive search functionality
 - Responsive design for mobile and desktop
 
-## API Documentation
+## 📚 API Documentation
 
 Full API documentation is available on the website:
 
@@ -190,7 +217,7 @@ curl "http://localhost:8000/api/v1/companies?company_name=Apple"
 curl "http://localhost:8000/api/v1/companies/{company_id}"
 ```
 
-## Technology Stack
+## 🛠️ Technology Stack
 
 - **Data Collection**: Kaggle API, Web Scraping (httpx, BeautifulSoup, trio)
 - **Cloud Storage**: AWS S3
@@ -201,7 +228,7 @@ curl "http://localhost:8000/api/v1/companies/{company_id}"
 - **Frontend**: HTML5, CSS3, JavaScript, Chart.js
 - **Deployment**: GitHub Pages
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 company-atlas/
@@ -233,7 +260,7 @@ company-atlas/
 └── requirements.txt       # Python dependencies
 ```
 
-## Setup
+## 🚀 Setup
 
 ### Prerequisites
 
@@ -284,7 +311,7 @@ dbt run
 dbt test
 ```
 
-## Citation
+## 📖 Citation
 
 If you use Company Atlas in your research or project, please cite:
 
@@ -297,7 +324,7 @@ https://coresheep.github.io/company-atlas/
 **Project Website**: [https://coresheep.github.io/company-atlas/](https://coresheep.github.io/company-atlas/)  
 **Year**: 2025
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 

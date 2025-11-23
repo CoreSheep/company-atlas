@@ -6,10 +6,8 @@
       <stop offset="100%" style="stop-color:#0d8c6f;stop-opacity:1" />
     </linearGradient>
   </defs>
-  <g transform="rotate(180 32 32)">
-    <!-- Pentagon shape -->
-    <polygon points="32,8 52,22 48,46 16,46 12,22" fill="url(#grad)" stroke="none"/>
-    <!-- Inner accent -->
-    <polygon points="32,16 46,26 43,40 21,40 18,26" fill="rgba(255,255,255,0.15)" stroke="none"/>
-  </g>
+  <!-- Pentagon shape - original orientation pointing UP (point at top y=8, wider at bottom y=46) -->
+  <polygon points="32,8 52,22 48,46 16,46 12,22" fill="url(#grad)" stroke="none"/>
+  <!-- Inner accent -->
+  <polygon points="32,16 46,26 43,40 21,40 18,26" fill="rgba(255,255,255,0.15)" stroke="none"/>
 </svg>

@@ -1,0 +1,119 @@
+version: 2
+
+models:
+  - name: bronze_dim_companies
+    description: "Bronze dimension table with cleaned company master data from raw layer, applying data quality improvements and normalization"
+    columns:
+      - name: company_id
+        description: "Unique identifier for company (MD5 hash)"
+        tests:
+          - not_null
+          - unique
+      - name: company_name
+        description: "Company name (normalized, uppercase)"
+        tests:
+          - not_null
+          - unique
+      - name: ticker
+        description: "Stock ticker symbol (normalized, uppercase)"
+      - name: sector
+        description: "Business sector"
+      - name: industry
+        description: "Industry classification (standardized)"
+      - name: industry_primary
+        description: "Primary industry classification"
+      - name: country
+        description: "Country location (normalized, uppercase)"
+      - name: headquarters_city
+        description: "Headquarters city"
+      - name: headquarters_state
+        description: "Headquarters state"
+      - name: ceo
+        description: "Chief Executive Officer name"
+      - name: website
+        description: "Company website URL (normalized, lowercase)"
+      - name: founded_year
+        description: "Year company was founded (validated: 1800-current year)"
+      - name: source_system
+        description: "Source system identifier"
+        tests:
+          - not_null
+      - name: loaded_at
+        description: "Timestamp when record was loaded"
+      - name: dim_created_at
+        description: "Timestamp when dimension record was created"
+      - name: bronze_processed_at
+        description: "Timestamp when bronze processing was completed"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - company_name
+            - country
+
+  - name: bronze_fct_company_metrics
+    description: "Bronze fact table with cleaned company metrics from raw layer, applying data quality improvements and standardization"
+    columns:
+      - name: company_id
+        description: "Foreign key to bronze_dim_companies"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('bronze_dim_companies')
+                field: company_id
+      - name: company_name
+        description: "Company name (for reference)"
+        tests:
+          - not_null
+      - name: fortune_rank
+        description: "Fortune 1000 ranking (validated: 1-1000)"
+      - name: employee_count
+        description: "Number of employees (validated: non-negative)"
+      - name: revenue_millions
+        description: "Revenue in millions (validated: non-negative)"
+      - name: revenue_percent_change
+        description: "Percentage change in revenue"
+      - name: profits_m
+        description: "Profits in millions"
+      - name: profits_percent_change
+        description: "Percentage change in profits"
+      - name: assets_m
+        description: "Assets in millions"
+      - name: market_cap_updated_m
+        description: "Updated market capitalization (millions)"
+      - name: metric_date
+        description: "Date of the metrics (validated: within last 10 years)"
+        tests:
+          - not_null
+      - name: source_system
+        description: "Source system identifier"
+        tests:
+          - not_null
+      - name: loaded_at
+        description: "Timestamp when record was loaded"
+      - name: bronze_processed_at
+        description: "Timestamp when bronze processing was completed"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - company_id
+            - metric_date
+
+  - name: bronze_dim_founder
+    description: "Bronze dimension table with founder information extracted from staging data"
+    columns:
+      - name: id
+        description: "Unique identifier for founder record (MD5 hash of company identifiers)"
+        tests:
+          - not_null
+          - unique
+      - name: company_name
+        description: "Company name (normalized, uppercase)"
+        tests:
+          - not_null
+      - name: founder_name
+        description: "Founder name (extracted from CEO field when Founder_is_CEO = 'YES')"
+        tests:
+          - not_null
+      - name: bronze_processed_at
+        description: "Timestamp when bronze processing was completed"

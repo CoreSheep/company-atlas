@@ -1,0 +1,60 @@
+version: 2
+
+models:
+  - name: unified_companies
+    description: "Unified companies table with essential company attributes from bronze layer, containing only clean, business-ready columns"
+    columns:
+      - name: company_id
+        description: "Unique identifier for company"
+        tests:
+          - not_null
+          - unique
+      - name: company_name
+        description: "Company name (normalized)"
+        tests:
+          - not_null
+          - unique
+      - name: ticker
+        description: "Stock ticker symbol"
+      - name: fortune_rank
+        description: "Fortune 1000 ranking (validated: 1-1000)"
+      - name: domain
+        description: "Business domain/sector (renamed from sector)"
+      - name: industry
+        description: "Industry classification"
+      - name: country
+        description: "Country location"
+        tests:
+          - not_null
+      - name: headquarters_city
+        description: "Headquarters city"
+      - name: headquarters_state
+        description: "Headquarters state"
+      - name: ceo
+        description: "Chief Executive Officer name"
+      - name: website
+        description: "Company website URL (normalized, lowercase)"
+      - name: founded_year
+        description: "Year company was founded"
+      - name: employee_count
+        description: "Number of employees (prefers fact table, falls back to dimension)"
+      - name: revenue
+        description: "Revenue amount (from fact table revenue_millions)"
+      - name: market_cap_updated_m
+        description: "Updated market capitalization (millions)"
+      - name: revenue_percent_change
+        description: "Percentage change in revenue"
+      - name: profits_m
+        description: "Profits in millions"
+      - name: profits_percent_change
+        description: "Percentage change in profits"
+      - name: assets_m
+        description: "Assets in millions"
+      - name: source_system
+        description: "Source system identifier"
+        tests:
+          - not_null
+      - name: last_updated_at
+        description: "Timestamp of last update (prefers fact metric_date, falls back to dimension loaded_at)"
+      - name: mart_created_at
+        description: "Timestamp when mart record was created"

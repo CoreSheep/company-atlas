@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Company Atlas - Unified firmographic data pipeline and interactive data product">
+    <title>Company Atlas</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">Company Atlas</div>
+            <ul class="nav-menu">
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#statistics">Statistics</a></li>
+                <li><a href="#profiles">Companies</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#api">API</a></li>
+                <li><a href="#examples">Examples</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="hero-title">Company Atlas</h1>
+            <p class="hero-subtitle">Unified firmographic data pipeline and interactive data product</p>
+            <div class="hero-buttons">
+                <a href="#api" class="btn btn-primary">Explore API</a>
+                <a href="docs/api.html" class="btn btn-secondary">Documentation</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Overview Section -->
+    <section id="overview" class="section">
+        <div class="container">
+            <h2 class="section-title">Unified Company Data</h2>
+            <p class="section-description">
+                Company Atlas collects, cleans, and normalizes firmographic data from multiple sources,
+                producing an analytics-ready dataset with millions of companies worldwide.
+            </p>
+            <div class="grid grid-3">
+                <div class="card">
+                    <div class="card-icon">📊</div>
+                    <h3 class="card-title">Multi-Source</h3>
+                    <p class="card-description">
+                        Aggregates data from Kaggle datasets including Techsalerator's USA
+                        and The 17M+ Company Dataset
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔧</div>
+                    <h3 class="card-title">Automated Pipeline</h3>
+                    <p class="card-description">
+                        Apache Airflow orchestration with automated data quality checks
+                        using dbt tests and Great Expectations
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🎯</div>
+                    <h3 class="card-title">Unified Schema</h3>
+                    <p class="card-description">
+                        Consistent data model with deduplication across sources,
+                        ready for analytics and visualization
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section id="statistics" class="section section-alt">
+        <div class="container">
+            <h2 class="section-title">Dataset Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-companies">-</div>
+                    <div class="stat-label">Total Companies</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-countries">-</div>
+                    <div class="stat-label">Countries</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-industries">-</div>
+                    <div class="stat-label">Industries</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avg-employees">-</div>
+                    <div class="stat-label">Avg Employees</div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3 class="chart-title">Top Countries</h3>
+                <canvas id="countries-chart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3 class="chart-title">Top Industries</h3>
+                <canvas id="industries-chart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3 class="chart-title">Revenue Distribution</h3>
+                <canvas id="revenue-chart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section">
+        <div class="container">
+            <h2 class="section-title">Architecture & Features</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <h3 class="feature-title">Cloud Storage</h3>
+                    <p>S3 for raw data storage with efficient Parquet format</p>
+                </div>
+                <div class="feature-item">
+                    <h3 class="feature-title">Data Warehouse</h3>
+                    <p>Snowflake for staging and analytics-ready tables</p>
+                </div>
+                <div class="feature-item">
+                    <h3 class="feature-title">Transformation</h3>
+                    <p>dbt for modeling and data transformation with version control</p>
+                </div>
+                <div class="feature-item">
+                    <h3 class="feature-title">Data Quality</h3>
+                    <p>dbt tests and Great Expectations for comprehensive validation</p>
+                </div>
+                <div class="feature-item">
+                    <h3 class="feature-title">Orchestration</h3>
+                    <p>Apache Airflow for automated workflow scheduling</p>
+                </div>
+                <div class="feature-item">
+                    <h3 class="feature-title">Graph Database</h3>
+                    <p>Neo4j for relationship visualization and network analysis</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Section -->
+    <section id="api" class="section section-alt">
+        <div class="container">
+            <h2 class="section-title">REST API</h2>
+            <p class="section-description">
+                Access the unified company dataset through a modern REST API built with FastAPI.
+                Interactive documentation and comprehensive filtering capabilities.
+            </p>
+            
+            <div class="api-endpoints">
+                <div class="endpoint-card">
+                    <div class="endpoint-method get">GET</div>
+                    <div class="endpoint-details">
+                        <code class="endpoint-path">/api/v1/companies</code>
+                        <p class="endpoint-description">Search and retrieve companies with filtering and pagination</p>
+                        <div class="endpoint-params">
+                            <span class="param">page</span>
+                            <span class="param">page_size</span>
+                            <span class="param">company_name</span>
+                            <span class="param">industry</span>
+                            <span class="param">country</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="endpoint-card">
+                    <div class="endpoint-method get">GET</div>
+                    <div class="endpoint-details">
+                        <code class="endpoint-path">/api/v1/companies/{id}</code>
+                        <p class="endpoint-description">Get a specific company by ID</p>
+                    </div>
+                </div>
+                
+                <div class="endpoint-card">
+                    <div class="endpoint-method get">GET</div>
+                    <div class="endpoint-details">
+                        <code class="endpoint-path">/api/v1/statistics</code>
+                        <p class="endpoint-description">Get dataset statistics and distributions</p>
+                    </div>
+                </div>
+                
+                <div class="endpoint-card">
+                    <div class="endpoint-method get">GET</div>
+                    <div class="endpoint-details">
+                        <code class="endpoint-path">/api/v1/industries</code>
+                        <p class="endpoint-description">Get list of all industries</p>
+                    </div>
+                </div>
+                
+                <div class="endpoint-card">
+                    <div class="endpoint-method get">GET</div>
+                    <div class="endpoint-details">
+                        <code class="endpoint-path">/api/v1/countries</code>
+                        <p class="endpoint-description">Get list of all countries</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="api-actions">
+                <a href="http://localhost:8000/docs" class="btn btn-primary" target="_blank">Interactive API Docs</a>
+                <a href="http://localhost:8000/redoc" class="btn btn-secondary" target="_blank">ReDoc</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Company Profiles Section -->
+    <section id="profiles" class="section">
+        <div class="container">
+            <h2 class="section-title">Top Companies</h2>
+            <p class="section-description">
+                Explore profiles of leading companies from the Fortune 1000 dataset
+            </p>
+            <div id="company-profiles" class="company-profiles-grid">
+                <!-- Company cards will be dynamically loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Examples Section -->
+    <section id="examples" class="section section-alt">
+        <div class="container">
+            <h2 class="section-title">Example Usage</h2>
+            <div class="code-examples">
+                <div class="code-block">
+                    <div class="code-header">Python</div>
+                    <pre><code>import requests
+
+# Search companies by industry
+response = requests.get(
+    "http://localhost:8000/api/v1/companies",
+    params={
+        "industry": "Technology",
+        "country": "USA",
+        "min_employees": 100,
+        "page": 1,
+        "page_size": 10
+    }
+)
+
+companies = response.json()
+print(f"Found {companies['total']} companies")
+for company in companies['companies']:
+    print(f"- {company['company_name']} ({company['domain']})")</code></pre>
+                </div>
+                
+                <div class="code-block">
+                    <div class="code-header">cURL</div>
+                    <pre><code># Get statistics
+curl "http://localhost:8000/api/v1/statistics"
+
+# Search companies
+curl "http://localhost:8000/api/v1/companies?industry=Technology&country=USA"
+
+# Get specific company
+curl "http://localhost:8000/api/v1/companies/{company_id}"</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Company Atlas. Open source data pipeline project.</p>
+            <div class="footer-links">
+                <a href="https://github.com">GitHub</a>
+                <a href="docs/api.html">API Documentation</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - Company Atlas</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/api-docs.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">Company Atlas</div>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../index.html#api">API</a></li>
+                <li><a href="api.html">Documentation</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="section">
+        <div class="container">
+            <h1 class="section-title">API Documentation</h1>
+            <p class="section-description">
+                Complete reference for the Company Atlas REST API
+            </p>
+
+            <div class="api-doc-content">
+                <h2>Base URL</h2>
+                <code class="api-base-url">http://localhost:8000/api/v1</code>
+
+                <h2>Authentication</h2>
+                <p>Currently, the API does not require authentication. In production, API keys or OAuth2 should be implemented.</p>
+
+                <h2>Endpoints</h2>
+
+                <div class="endpoint-doc">
+                    <h3>GET /companies</h3>
+                    <p>Search and retrieve companies with filtering and pagination.</p>
+                    
+                    <h4>Query Parameters</h4>
+                    <table class="api-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>page</code></td>
+                                <td>integer</td>
+                                <td>No</td>
+                                <td>Page number (default: 1)</td>
+                            </tr>
+                            <tr>
+                                <td><code>page_size</code></td>
+                                <td>integer</td>
+                                <td>No</td>
+                                <td>Results per page (default: 10, max: 100)</td>
+                            </tr>
+                            <tr>
+                                <td><code>company_name</code></td>
+                                <td>string</td>
+                                <td>No</td>
+                                <td>Filter by company name (partial match)</td>
+                            </tr>
+                            <tr>
+                                <td><code>industry</code></td>
+                                <td>string</td>
+                                <td>No</td>
+                                <td>Filter by industry</td>
+                            </tr>
+                            <tr>
+                                <td><code>country</code></td>
+                                <td>string</td>
+                                <td>No</td>
+                                <td>Filter by country</td>
+                            </tr>
+                            <tr>
+                                <td><code>min_employees</code></td>
+                                <td>integer</td>
+                                <td>No</td>
+                                <td>Minimum employee count</td>
+                            </tr>
+                            <tr>
+                                <td><code>max_employees</code></td>
+                                <td>integer</td>
+                                <td>No</td>
+                                <td>Maximum employee count</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Example Request</h4>
+                    <pre><code>GET /api/v1/companies?industry=Technology&country=USA&min_employees=100&page=1&page_size=10</code></pre>
+
+                    <h4>Example Response</h4>
+                    <pre><code>{
+  "companies": [
+    {
+      "company_id": "abc123",
+      "company_name": "Example Corp",
+      "domain": "example.com",
+      "industry": "Technology",
+      "country": "USA",
+      "employee_count": 1000,
+      "revenue": 50000000.0,
+      "founded_year": 2010,
+      "source_system": "techsalerator_usa",
+      "last_updated_at": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "total": 1500,
+  "page": 1,
+  "page_size": 10
+}</code></pre>
+                </div>
+
+                <div class="endpoint-doc">
+                    <h3>GET /companies/{company_id}</h3>
+                    <p>Get a specific company by ID.</p>
+                    
+                    <h4>Path Parameters</h4>
+                    <table class="api-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>company_id</code></td>
+                                <td>string</td>
+                                <td>Company identifier (MD5 hash)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Example Request</h4>
+                    <pre><code>GET /api/v1/companies/abc123</code></pre>
+                </div>
+
+                <div class="endpoint-doc">
+                    <h3>GET /statistics</h3>
+                    <p>Get dataset statistics and distributions.</p>
+                    
+                    <h4>Example Response</h4>
+                    <pre><code>{
+  "total_companies": 1000000,
+  "countries": {
+    "USA": 500000,
+    "UK": 200000,
+    ...
+  },
+  "industries": {
+    "Technology": 300000,
+    "Finance": 150000,
+    ...
+  },
+  "average_employee_count": 250.5,
+  "average_revenue": 10000000.0,
+  "oldest_company_year": 1800,
+  "newest_company_year": 2024
+}</code></pre>
+                </div>
+
+                <div class="endpoint-doc">
+                    <h3>GET /industries</h3>
+                    <p>Get list of all unique industries.</p>
+                    
+                    <h4>Example Response</h4>
+                    <pre><code>["Technology", "Finance", "Healthcare", ...]</code></pre>
+                </div>
+
+                <div class="endpoint-doc">
+                    <h3>GET /countries</h3>
+                    <p>Get list of all unique countries.</p>
+                    
+                    <h4>Example Response</h4>
+                    <pre><code>["USA", "UK", "Canada", ...]</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Company Atlas. Open source data pipeline project.</p>
+            <div class="footer-links">
+                <a href="https://github.com">GitHub</a>
+                <a href="../index.html">Home</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
+

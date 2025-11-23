@@ -1,0 +1,64 @@
+version: 2
+
+sources:
+  - name: staging
+    description: "Staging tables in STAGING schema from Snowflake"
+    schema: STAGING
+    database: COMPANY_ATLAS
+    tables:
+      - name: stg_fortune1000
+        identifier: STG_FORTUNE1000
+        description: "Staging table for Fortune 1000 data loaded from S3"
+        columns:
+          - name: rank
+            description: "Fortune 1000 ranking"
+          - name: company
+            description: "Company name"
+          - name: ticker
+            description: "Stock ticker symbol"
+          - name: sector
+            description: "Business sector"
+          - name: industry
+            description: "Industry classification"
+          - name: number_of_employees
+            description: "Total number of employees"
+          - name: revenues_m
+            description: "Revenue in millions"
+          - name: country
+            description: "Country location"
+          - name: website
+            description: "Company website URL"
+          - name: ceo
+            description: "Chief Executive Officer name"
+          - name: headquarterscity
+            description: "Headquarters city"
+          - name: headquartersstate
+            description: "Headquarters state"
+          - name: updated
+            description: "Date of last update"
+
+      - name: stg_global_companies
+        identifier: STG_GLOBAL_COMPANIES
+        description: "Staging table for global companies data loaded from S3"
+        columns:
+          - name: company_name
+            description: "Company name"
+          - name: domain
+            description: "Company website domain"
+          - name: industry
+            description: "Industry classification"
+          - name: industry_alt
+            description: "Alternative industry classification"
+          - name: country
+            description: "Country location"
+          - name: employee_count
+            description: "Number of employees"
+          - name: revenue
+            description: "Revenue amount"
+          - name: founded_year
+            description: "Year company was founded"
+          - name: source_system
+            description: "Source system identifier"
+          - name: last_updated_at
+            description: "Last update timestamp"
+

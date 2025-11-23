@@ -1,0 +1,84 @@
+-- Snowflake Setup Script for Company Atlas Project
+-- This script creates a new user for dbt transformations in the company-atlas project
+-- Run this as ACCOUNTADMIN or a user with sufficient privileges
+
+-- Step 1: Use an admin role
+USE ROLE ACCOUNTADMIN;
+
+-- Step 2: Create the TRANSFORM role and assign it to ACCOUNTADMIN
+CREATE ROLE IF NOT EXISTS TRANSFORM;
+GRANT ROLE TRANSFORM TO ROLE ACCOUNTADMIN;
+
+-- Step 3: Create a default warehouse
+CREATE WAREHOUSE IF NOT EXISTS COMPUTE_WH
+    WITH WAREHOUSE_SIZE = 'X-SMALL'
+    AUTO_SUSPEND = 60
+    AUTO_RESUME = TRUE
+    INITIALLY_SUSPENDED = TRUE;
+
+GRANT OPERATE ON WAREHOUSE COMPUTE_WH TO ROLE TRANSFORM;
+
+-- Step 4: Create the dbt-company-atlas user and assign to the transform role
+-- Note: Snowflake usernames can use underscores instead of hyphens for better compatibility
+-- Using DBT_COMPANY_ATLAS as the username (hyphens in usernames may require quoting)
+CREATE USER IF NOT EXISTS DBT_COMPANY_ATLAS
+    PASSWORD='dbtCompanyAtlas123!'
+    LOGIN_NAME='DBT_COMPANY_ATLAS'
+    MUST_CHANGE_PASSWORD=FALSE
+    DEFAULT_WAREHOUSE='COMPUTE_WH'
+    DEFAULT_ROLE=TRANSFORM
+    DEFAULT_NAMESPACE='COMPANY_ATLAS.RAW'
+    COMMENT='DBT user used for Company Atlas data transformation';
+
+-- Grant the TRANSFORM role to the user
+GRANT ROLE TRANSFORM TO USER DBT_COMPANY_ATLAS;
+
+-- Step 5: Create the database and schemas if they don't exist
+CREATE DATABASE IF NOT EXISTS COMPANY_ATLAS
+    COMMENT='Company Atlas database for firmographic data';
+
+USE DATABASE COMPANY_ATLAS;
+
+ALTER USER DBT_COMPANY_ATLAS SET MINS_TO_BYPASS_MFA = NULL;
+
+-- Create schemas
+CREATE SCHEMA IF NOT EXISTS RAW
+    COMMENT='Raw data from ingestion';
+CREATE SCHEMA IF NOT EXISTS STAGING
+    COMMENT='Staging tables for dbt';
+CREATE SCHEMA IF NOT EXISTS MARTS
+    COMMENT='Data marts for business users';
+CREATE SCHEMA IF NOT EXISTS ANALYTICS
+    COMMENT='Analytics and reporting tables';
+
+-- Step 6: Grant privileges on database and schemas
+GRANT USAGE ON DATABASE COMPANY_ATLAS TO ROLE TRANSFORM;
+GRANT USAGE ON SCHEMA COMPANY_ATLAS.RAW TO ROLE TRANSFORM;
+GRANT USAGE ON SCHEMA COMPANY_ATLAS.STAGING TO ROLE TRANSFORM;
+GRANT USAGE ON SCHEMA COMPANY_ATLAS.MARTS TO ROLE TRANSFORM;
+GRANT USAGE ON SCHEMA COMPANY_ATLAS.ANALYTICS TO ROLE TRANSFORM;
+
+-- Step 7: Grant privileges on future objects
+GRANT SELECT ON FUTURE TABLES IN SCHEMA COMPANY_ATLAS.RAW TO ROLE TRANSFORM;
+GRANT SELECT ON FUTURE TABLES IN SCHEMA COMPANY_ATLAS.STAGING TO ROLE TRANSFORM;
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON FUTURE TABLES IN SCHEMA COMPANY_ATLAS.MARTS TO ROLE TRANSFORM;
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON FUTURE TABLES IN SCHEMA COMPANY_ATLAS.ANALYTICS TO ROLE TRANSFORM;
+
+-- Step 8: Grant privileges on existing tables (if any)
+GRANT SELECT ON ALL TABLES IN SCHEMA COMPANY_ATLAS.RAW TO ROLE TRANSFORM;
+GRANT SELECT ON ALL TABLES IN SCHEMA COMPANY_ATLAS.STAGING TO ROLE TRANSFORM;
+
+-- Step 9: Verify the user was created
+-- Show user details
+DESCRIBE USER DBT_COMPANY_ATLAS;
+
+-- Alternative: Show all users and find ours
+SHOW USERS LIKE 'DBT_COMPANY_ATLAS';
+
+-- Show granted roles
+SHOW GRANTS TO USER DBT_COMPANY_ATLAS;
+
+-- Verify the user can be found
+SELECT CURRENT_USER() AS current_user;
+SELECT CURRENT_ROLE() AS current_role;
+

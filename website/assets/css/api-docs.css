@@ -1,0 +1,102 @@
+.api-doc-content {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.api-doc-content h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: var(--spacing-lg) 0 var(--spacing-md) 0;
+    color: var(--color-text);
+}
+
+.api-doc-content h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+    color: var(--color-text);
+}
+
+.api-doc-content h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: var(--spacing-md) 0 var(--spacing-xs) 0;
+    color: var(--color-text);
+}
+
+.api-doc-content p {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.8;
+}
+
+.api-base-url {
+    display: inline-block;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-bg-alt);
+    border-radius: var(--border-radius);
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 1rem;
+    margin: var(--spacing-md) 0;
+}
+
+.endpoint-doc {
+    background: var(--color-card);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    margin: var(--spacing-md) 0;
+    border: 1px solid var(--color-border);
+}
+
+.api-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--spacing-md) 0;
+}
+
+.api-table th,
+.api-table td {
+    padding: var(--spacing-sm);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.api-table th {
+    font-weight: 600;
+    color: var(--color-text);
+    background: var(--color-bg-alt);
+}
+
+.api-table td {
+    color: var(--color-text-secondary);
+}
+
+.api-table code {
+    background: var(--color-bg-alt);
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 0.875rem;
+}
+
+.endpoint-doc pre {
+    background: #1e1e1e;
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    overflow-x: auto;
+    margin: var(--spacing-md) 0;
+}
+
+.endpoint-doc code {
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.endpoint-doc pre code {
+    color: #d4d4d4;
+    background: transparent;
+    padding: 0;
+}
+

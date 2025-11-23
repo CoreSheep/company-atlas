@@ -1,0 +1,99 @@
+version: 2
+
+models:
+  - name: raw_dim_companies
+    description: "Raw dimension table with company master data from staging tables, handling nulls and deduplication"
+    columns:
+      - name: company_id
+        description: "Unique identifier for company (MD5 hash)"
+        tests:
+          - not_null
+          - unique
+      - name: company_name
+        description: "Company name (normalized, uppercase)"
+        tests:
+          - not_null
+          - unique
+      - name: ticker
+        description: "Stock ticker symbol"
+      - name: website
+        description: "Company website URL"
+      - name: sector
+        description: "Business sector"
+      - name: industry
+        description: "Industry classification"
+      - name: industry_primary
+        description: "Primary industry classification"
+      - name: industry_secondary
+        description: "Secondary industry classification"
+      - name: country
+        description: "Country location (normalized, uppercase, defaults to 'UNKNOWN' if missing)"
+      - name: headquarters_city
+        description: "Headquarters city"
+      - name: headquarters_state
+        description: "Headquarters state"
+      - name: ceo
+        description: "Chief Executive Officer name"
+      - name: founded_year
+        description: "Year company was founded"
+      - name: founded_year_date
+        description: "Date when company was founded (if available)"
+      - name: employee_count
+        description: "Number of employees"
+      - name: revenue
+        description: "Revenue amount"
+      - name: source_system
+        description: "Source system identifier"
+        tests:
+          - not_null
+      - name: loaded_at
+        description: "Timestamp when record was loaded"
+      - name: dim_created_at
+        description: "Timestamp when dimension record was created"
+
+  - name: raw_fct_company_metrics
+    description: "Raw fact table with company metrics and financial data from staging tables, handling nulls and deduplication"
+    columns:
+      - name: company_id
+        description: "Foreign key to raw_dim_companies"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('raw_dim_companies')
+                field: company_id
+      - name: company_name
+        description: "Company name (for reference)"
+        tests:
+          - not_null
+      - name: fortune_rank
+        description: "Fortune 1000 ranking"
+      - name: employee_count
+        description: "Number of employees"
+      - name: revenue_millions
+        description: "Revenue in millions"
+      - name: revenue_percent_change
+        description: "Percentage change in revenue"
+      - name: profits_m
+        description: "Profits in millions"
+      - name: profits_percent_change
+        description: "Percentage change in profits"
+      - name: assets_m
+        description: "Assets in millions"
+      - name: market_cap_march_m
+        description: "Market capitalization in March (millions)"
+      - name: market_cap_updated_m
+        description: "Updated market capitalization (millions)"
+      - name: metric_date
+        description: "Date of the metrics"
+        tests:
+          - not_null
+      - name: source_system
+        description: "Source system identifier"
+        tests:
+          - not_null
+      - name: metric_effective_date
+        description: "Effective date of the metric"
+      - name: fact_created_at
+        description: "Timestamp when fact record was created"
+

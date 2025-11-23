@@ -5,6 +5,7 @@
 }
 
 .api-doc-content h2 {
+    font-family: var(--font-title);
     font-size: 2rem;
     font-weight: 700;
     margin: var(--spacing-lg) 0 var(--spacing-md) 0;
@@ -12,6 +13,7 @@
 }
 
 .api-doc-content h3 {
+    font-family: var(--font-title);
     font-size: 1.5rem;
     font-weight: 600;
     margin: var(--spacing-md) 0 var(--spacing-sm) 0;
@@ -19,6 +21,7 @@
 }
 
 .api-doc-content h4 {
+    font-family: var(--font-title);
     font-size: 1.25rem;
     font-weight: 600;
     margin: var(--spacing-md) 0 var(--spacing-xs) 0;
@@ -33,20 +36,30 @@
 
 .api-base-url {
     display: inline-block;
-    padding: var(--spacing-sm) var(--spacing-md);
-    background: var(--color-bg-alt);
-    border-radius: var(--border-radius);
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, rgba(16, 163, 127, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    border: 1px solid rgba(16, 163, 127, 0.2);
+    border-radius: 8px;
     font-family: 'Monaco', 'Courier New', monospace;
     font-size: 1rem;
     margin: var(--spacing-md) 0;
+    color: var(--color-primary);
+    font-weight: 600;
 }
 
 .endpoint-doc {
     background: var(--color-card);
-    border-radius: var(--border-radius);
-    padding: var(--spacing-md);
+    border-radius: 16px;
+    padding: 2rem;
     margin: var(--spacing-md) 0;
-    border: 1px solid var(--color-border);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
+}
+
+.endpoint-doc:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.1);
 }
 
 .api-table {
@@ -64,8 +77,8 @@
 
 .api-table th {
     font-weight: 600;
-    color: var(--color-text);
-    background: var(--color-bg-alt);
+    color: white;
+    background: linear-gradient(135deg, #10a37f 0%, #19c37d 100%);
 }
 
 .api-table td {
@@ -82,21 +95,137 @@
 
 .endpoint-doc pre {
     background: #1e1e1e;
-    border-radius: var(--border-radius);
-    padding: var(--spacing-md);
+    border-radius: 12px;
+    padding: 1.5rem;
     overflow-x: auto;
     margin: var(--spacing-md) 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+}
+
+.endpoint-doc pre::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #10a37f 0%, #19c37d 100%);
+    border-radius: 12px 12px 0 0;
 }
 
 .endpoint-doc code {
     font-family: 'Monaco', 'Courier New', monospace;
     font-size: 0.875rem;
-    line-height: 1.6;
+    line-height: 1.8;
 }
 
 .endpoint-doc pre code {
     color: #d4d4d4;
     background: transparent;
     padding: 0;
+    display: block;
+}
+
+/* Syntax highlighting improvements */
+.endpoint-doc pre code.language-json .token.string {
+    color: #4ec9b0;
+}
+
+.endpoint-doc pre code.language-json .token.number {
+    color: #b5cea8;
+}
+
+.endpoint-doc pre code.language-json .token.boolean {
+    color: #569cd6;
+}
+
+.endpoint-doc pre code.language-http {
+    color: #ce9178;
+}
+
+.endpoint-doc pre code.language-http .token.keyword {
+    color: #c586c0;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .api-doc-content h2 {
+        font-size: 1.5rem;
+        margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+        text-align: center;
+    }
+    
+    /* Center Base URL code block */
+    .api-doc-content h2 + .api-base-url {
+        text-align: center;
+    }
+    
+    /* Center paragraphs that directly follow h2 (Authentication section) */
+    .api-doc-content h2 + p {
+        text-align: center;
+    }
+    
+    /* Center content between h2 and next h2 or endpoint-doc */
+    .api-doc-content h2:first-of-type + .api-base-url,
+    .api-doc-content h2:nth-of-type(2) + p {
+        text-align: center;
+    }
+    
+    /* Keep endpoint docs and all their content left-aligned */
+    .endpoint-doc,
+    .endpoint-doc * {
+        text-align: left !important;
+    }
+    
+    .api-doc-content h3 {
+        margin: var(--spacing-sm) 0 var(--spacing-xs) 0;
+    }
+    
+    .api-doc-content h4 {
+        margin: var(--spacing-sm) 0 calc(var(--spacing-xs) / 2) 0;
+    }
+    
+    .api-doc-content p {
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .api-base-url {
+        font-size: 0.875rem;
+        padding: 0.625rem 1rem;
+        margin: var(--spacing-sm) 0;
+        display: block;
+        text-align: center;
+    }
+    
+    .endpoint-doc {
+        padding: 1.25rem;
+        margin: var(--spacing-sm) 0;
+    }
+    
+    .endpoint-doc pre {
+        padding: 1rem;
+        margin: var(--spacing-sm) 0;
+        font-size: 0.8125rem;
+    }
+    
+    .endpoint-doc pre code {
+        font-size: 0.8125rem;
+    }
+    
+    .api-table {
+        margin: var(--spacing-sm) 0;
+        font-size: 0.8125rem;
+    }
+    
+    .api-table th,
+    .api-table td {
+        padding: 0.625rem 0.5rem;
+    }
+    
+    .api-table code {
+        font-size: 0.75rem;
+    }
 }
 

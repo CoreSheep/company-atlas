@@ -3,25 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Company Atlas - Unified firmographic data pipeline and interactive data product">
+    <meta name="description" content="Company Atlas - A unified firmographic data platform with thousands of companies from open-source datasets">
     <title>Company Atlas</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link rel="apple-touch-icon" href="assets/favicon.png">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
-            <div class="nav-brand">Company Atlas</div>
-            <ul class="nav-menu">
+            <div class="nav-brand" id="logo-refresh" style="cursor: pointer;">
+                <img src="assets/favicon.svg" alt="Company Atlas">
+                <span>Company Atlas</span>
+            </div>
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu" id="nav-menu">
                 <li><a href="#overview">Overview</a></li>
                 <li><a href="#statistics">Statistics</a></li>
                 <li><a href="#profiles">Companies</a></li>
                 <li><a href="#features">Features</a></li>
                 <li><a href="#api">API</a></li>
-                <li><a href="#examples">Examples</a></li>
+                <li><a href="docs/api.html">Documentation</a></li>
+                <li>
+                    <a href="https://github.com/CoreSheep/company-atlas" target="_blank" rel="noopener noreferrer" class="github-link" aria-label="View source code on GitHub">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.82-.26.82-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </a>
+                </li>
             </ul>
         </div>
     </nav>
@@ -30,7 +48,7 @@
     <section class="hero">
         <div class="container">
             <h1 class="hero-title">Company Atlas</h1>
-            <p class="hero-subtitle">Unified firmographic data pipeline and interactive data product</p>
+            <p class="hero-subtitle">A unified firmographic data platform with thousands of companies from open-source datasets</p>
             <div class="hero-buttons">
                 <a href="#api" class="btn btn-primary">Explore API</a>
                 <a href="docs/api.html" class="btn btn-secondary">Documentation</a>
@@ -44,15 +62,15 @@
             <h2 class="section-title">Unified Company Data</h2>
             <p class="section-description">
                 Company Atlas collects, cleans, and normalizes firmographic data from multiple sources,
-                producing an analytics-ready dataset with millions of companies worldwide.
+                producing an analytics-ready dataset with thousands of companies worldwide.
             </p>
             <div class="grid grid-3">
                 <div class="card">
                     <div class="card-icon">📊</div>
                     <h3 class="card-title">Multi-Source</h3>
                     <p class="card-description">
-                        Aggregates data from Kaggle datasets including Techsalerator's USA
-                        and The 17M+ Company Dataset
+                        Combines open-source Kaggle Fortune 1000 dataset with web crawler enrichment
+                        from multiple data sources
                     </p>
                 </div>
                 <div class="card">
@@ -67,10 +85,32 @@
                     <div class="card-icon">🎯</div>
                     <h3 class="card-title">Unified Schema</h3>
                     <p class="card-description">
-                        Consistent data model with deduplication across sources,
-                        ready for analytics and visualization
+                        Star schema design with dimension and fact tables, 
+                        deduplication across sources, ready for analytics and visualization
                     </p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Company Profiles Section -->
+    <section id="profiles" class="section section-alt">
+        <div class="container">
+            <h2 class="section-title">
+                Top Companies by Market Cap
+                <span class="data-update-icon" data-tooltip="The company data is from Fortune 1000 American companies 2024 dataset and updated up to 2024-06-04">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                </span>
+            </h2>
+            <p class="section-description">
+                Explore profiles of leading companies ranked by market capitalization
+            </p>
+            <div id="company-profiles" class="company-profiles-grid">
+                <!-- Company cards will be dynamically loaded here -->
             </div>
         </div>
     </section>
@@ -78,15 +118,24 @@
     <!-- Statistics Section -->
     <section id="statistics" class="section section-alt">
         <div class="container">
-            <h2 class="section-title">Dataset Statistics</h2>
+            <h2 class="section-title">
+                Dataset Statistics
+                <span class="data-update-icon" data-tooltip="The statistics are from Fortune 1000 American companies 2024 dataset and updated up to 2024-06-04">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                </span>
+            </h2>
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-value" id="total-companies">-</div>
                     <div class="stat-label">Total Companies</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="total-countries">-</div>
-                    <div class="stat-label">Countries</div>
+                    <div class="stat-value" id="total-revenue">-</div>
+                    <div class="stat-label">Total Revenue</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="total-industries">-</div>
@@ -98,51 +147,149 @@
                 </div>
             </div>
             
-            <div class="chart-container">
-                <h3 class="chart-title">Top Countries</h3>
-                <canvas id="countries-chart"></canvas>
-            </div>
-            
+            <!-- Dashboard Carousel -->
+            <div class="dashboard-carousel">
+                <div class="dashboard-wrapper">
+                    <div class="dashboard-slide active">
             <div class="chart-container">
                 <h3 class="chart-title">Top Industries</h3>
                 <canvas id="industries-chart"></canvas>
             </div>
-            
-            <div class="chart-container">
-                <h3 class="chart-title">Revenue Distribution</h3>
-                <canvas id="revenue-chart"></canvas>
+                    </div>
+                    <div class="dashboard-slide">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Revenue Distribution</h3>
+                            <canvas id="revenue-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="dashboard-slide">
+                        <div class="chart-container">
+                            <h3 class="chart-title">City Distribution</h3>
+                            <canvas id="cities-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="dashboard-slide">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Employee Count Distribution</h3>
+                            <canvas id="employees-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="dashboard-slide">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Revenue % Change</h3>
+                            <canvas id="revenue-change-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="dashboard-slide">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Revenue Growth & Decline</h3>
+                            <canvas id="revenue-growth-decline-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-controls">
+                    <button class="carousel-btn carousel-btn-prev" id="prev-dashboard" aria-label="Previous dashboard">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 18l-6-6 6-6"/>
+                        </svg>
+                    </button>
+                    <div class="dashboard-indicators" id="dashboard-indicators"></div>
+                    <button class="carousel-btn carousel-btn-next" id="next-dashboard" aria-label="Next dashboard">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </section>
 
+    <!-- Search Section -->
+    <section id="search" class="section">
+        <div class="container">
+            <h2 class="section-title">Search Companies</h2>
+            <p class="section-description">
+                Search by company name or CEO name
+            </p>
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="Search by company name or CEO...">
+                <button id="search-btn" class="search-btn">Search</button>
+            </div>
+            <div id="search-results" class="search-results-table"></div>
+        </div>
+    </section>
+
     <!-- Features Section -->
-    <section id="features" class="section">
+    <section id="features" class="section section-alt">
         <div class="container">
             <h2 class="section-title">Architecture & Features</h2>
+            <p class="section-description" style="text-align: center; max-width: 700px; margin: 0 auto 3rem;">
+                A modern data pipeline architecture built with industry-leading tools for scalable, reliable, and maintainable data processing
+            </p>
             <div class="features-grid">
-                <div class="feature-item">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                    </div>
                     <h3 class="feature-title">Cloud Storage</h3>
-                    <p>S3 for raw data storage with efficient Parquet format</p>
+                    <p class="feature-description">AWS S3 for raw data storage with CSV and Parquet formats</p>
                 </div>
-                <div class="feature-item">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                            <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+                            <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+                            <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                    </div>
                     <h3 class="feature-title">Data Warehouse</h3>
-                    <p>Snowflake for staging and analytics-ready tables</p>
+                    <p class="feature-description">Snowflake for staging and analytics-ready tables</p>
                 </div>
-                <div class="feature-item">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="16 18 22 12 16 6"></polyline>
+                            <polyline points="8 6 2 12 8 18"></polyline>
+                        </svg>
+                    </div>
                     <h3 class="feature-title">Transformation</h3>
-                    <p>dbt for modeling and data transformation with version control</p>
+                    <p class="feature-description">dbt for modeling and data transformation with version control</p>
                 </div>
-                <div class="feature-item">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </div>
                     <h3 class="feature-title">Data Quality</h3>
-                    <p>dbt tests and Great Expectations for comprehensive validation</p>
+                    <p class="feature-description">dbt tests and Great Expectations for comprehensive validation</p>
                 </div>
-                <div class="feature-item">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
                     <h3 class="feature-title">Orchestration</h3>
-                    <p>Apache Airflow for automated workflow scheduling</p>
+                    <p class="feature-description">Apache Airflow for automated workflow scheduling</p>
                 </div>
-                <div class="feature-item">
-                    <h3 class="feature-title">Graph Database</h3>
-                    <p>Neo4j for relationship visualization and network analysis</p>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">API & Visualization</h3>
+                    <p class="feature-description">FastAPI REST endpoints with interactive web interface</p>
                 </div>
             </div>
         </div>
@@ -208,20 +355,7 @@
             
             <div class="api-actions">
                 <a href="http://localhost:8000/docs" class="btn btn-primary" target="_blank">Interactive API Docs</a>
-                <a href="http://localhost:8000/redoc" class="btn btn-secondary" target="_blank">ReDoc</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Company Profiles Section -->
-    <section id="profiles" class="section">
-        <div class="container">
-            <h2 class="section-title">Top Companies</h2>
-            <p class="section-description">
-                Explore profiles of leading companies from the Fortune 1000 dataset
-            </p>
-            <div id="company-profiles" class="company-profiles-grid">
-                <!-- Company cards will be dynamically loaded here -->
+                <a href="docs/api.html" class="btn btn-secondary">Documentation</a>
             </div>
         </div>
     </section>
@@ -233,15 +367,13 @@
             <div class="code-examples">
                 <div class="code-block">
                     <div class="code-header">Python</div>
-                    <pre><code>import requests
+                    <pre><code class="language-python">import requests
 
-# Search companies by industry
+# Search for Apple by company name
 response = requests.get(
     "http://localhost:8000/api/v1/companies",
     params={
-        "industry": "Technology",
-        "country": "USA",
-        "min_employees": 100,
+        "company_name": "Apple",
         "page": 1,
         "page_size": 10
     }
@@ -250,18 +382,21 @@ response = requests.get(
 companies = response.json()
 print(f"Found {companies['total']} companies")
 for company in companies['companies']:
-    print(f"- {company['company_name']} ({company['domain']})")</code></pre>
+    print(f"- {company['company_name']} ({company['domain']})")
+    print(f"  Industry: {company['industry']}")
+    print(f"  Revenue: ${company['revenue']:,.0f}")
+    print(f"  Employees: {company['employee_count']:,}")</code></pre>
                 </div>
                 
                 <div class="code-block">
                     <div class="code-header">cURL</div>
-                    <pre><code># Get statistics
+                    <pre><code class="language-bash"># Get statistics
 curl "http://localhost:8000/api/v1/statistics"
 
-# Search companies
-curl "http://localhost:8000/api/v1/companies?industry=Technology&country=USA"
+# Search for Apple
+curl "http://localhost:8000/api/v1/companies?company_name=Apple"
 
-# Get specific company
+# Get specific company by ID
 curl "http://localhost:8000/api/v1/companies/{company_id}"</code></pre>
                 </div>
             </div>
@@ -271,15 +406,35 @@ curl "http://localhost:8000/api/v1/companies/{company_id}"</code></pre>
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2024 Company Atlas. Open source data pipeline project.</p>
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <p class="footer-title">Company <span class="footer-highlight">Atlas</span></p>
+                    <p class="footer-description">A unified firmographic data platform</p>
+                </div>
             <div class="footer-links">
-                <a href="https://github.com">GitHub</a>
-                <a href="docs/api.html">API Documentation</a>
+                    <a href="#overview">Overview</a>
+                    <a href="#statistics">Statistics</a>
+                    <a href="#profiles">Companies</a>
+                    <a href="#api">API</a>
+                    <a href="docs/api.html">Documentation</a>
+                    <a href="https://github.com/CoreSheep/company-atlas" target="_blank" rel="noopener noreferrer" class="footer-link-highlight">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.82-.26.82-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        Source Code
+                    </a>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                <p>&copy; 2025 Company Atlas. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
     <script src="assets/js/main.js"></script>
 </body>
 </html>

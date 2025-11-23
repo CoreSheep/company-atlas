@@ -1,6 +1,10 @@
 // Main JavaScript for Company Atlas website
 
-const DATA_BASE_PATH = '../data/marts';
+// Use relative path for GitHub Pages (data files need to be in the website directory or accessible)
+// For GitHub Pages, we'll need to either:
+// 1. Copy data files to website directory, or
+// 2. Use a CDN/API endpoint
+const DATA_BASE_PATH = './data/marts';
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', async () => {

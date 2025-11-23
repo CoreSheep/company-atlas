@@ -27,6 +27,57 @@ Company Atlas collects, cleans, and normalizes firmographic data from multiple s
 └─────────────┘     └─────────────┘     └──────────┘     └──────────┘
 ```
 
+## Features
+
+### 📊 Statistics Dashboard
+
+![Statistics Dashboard](images/feature_statistics.png)
+
+- **Total Companies**: Count of all companies in the dataset
+- **Total Revenue**: Aggregate revenue across all companies
+- **Industries**: Number of unique industries
+- **Average Employees**: Mean employee count
+
+### 🏢 Company Profiles
+
+![Company Profiles](images/feature_companies.png)
+
+- **Top Companies by Market Cap**: Display of leading companies with logos
+- **Company Details**: Market cap, Fortune rank, industry, revenue, employees, founded year
+- **Interactive Cards**: Elegant company profile cards with visual hierarchy
+
+### 📈 Live Dashboards
+
+Interactive carousel with multiple visualizations:
+- **Top Industries**: Bar chart showing industry distribution
+- **Revenue Distribution**: Histogram of company revenues
+- **City Distribution**: Geographic distribution of company headquarters
+- **Employee Count Distribution**: Workforce size analysis
+- **Revenue % Change**: Year-over-year revenue growth/decline
+- **Revenue Growth & Decline**: Combined visualization of top performers
+
+### 🔍 Interactive Search
+
+![Company Search](images/feature_company_search.png)
+
+- Search by company name or CEO name
+- Real-time filtering and results display
+- Sortable table with key company metrics
+- Displays: company name, ticker, CEO, founded year, domain, industry, headquarters, market cap, revenue
+
+### 🌐 REST API
+
+![REST API](images/feature_api.png)
+
+FastAPI-based RESTful API with comprehensive endpoints:
+- `GET /api/v1/companies` - Search and retrieve companies with filtering
+- `GET /api/v1/companies/{id}` - Get specific company by ID
+- `GET /api/v1/statistics` - Dataset statistics and distributions
+- `GET /api/v1/industries` - List of all industries
+- `GET /api/v1/countries` - List of all countries
+
+**Interactive Documentation**: Available at `/docs` endpoint with Swagger UI
+
 ## Data Pipelines
 
 ### 1. Data Collection
@@ -93,57 +144,6 @@ Company Atlas collects, cleans, and normalizes firmographic data from multiple s
 - Real-time statistics and company profiles
 - Interactive search functionality
 - Responsive design for mobile and desktop
-
-## Features
-
-### 📊 Statistics Dashboard
-
-![Statistics Dashboard](images/feature_statistics.png)
-
-- **Total Companies**: Count of all companies in the dataset
-- **Total Revenue**: Aggregate revenue across all companies
-- **Industries**: Number of unique industries
-- **Average Employees**: Mean employee count
-
-### 🏢 Company Profiles
-
-![Company Profiles](images/feature_companies.png)
-
-- **Top Companies by Market Cap**: Display of leading companies with logos
-- **Company Details**: Market cap, Fortune rank, industry, revenue, employees, founded year
-- **Interactive Cards**: Elegant company profile cards with visual hierarchy
-
-### 📈 Live Dashboards
-
-Interactive carousel with multiple visualizations:
-- **Top Industries**: Bar chart showing industry distribution
-- **Revenue Distribution**: Histogram of company revenues
-- **City Distribution**: Geographic distribution of company headquarters
-- **Employee Count Distribution**: Workforce size analysis
-- **Revenue % Change**: Year-over-year revenue growth/decline
-- **Revenue Growth & Decline**: Combined visualization of top performers
-
-### 🔍 Interactive Search
-
-![Company Search](images/feature_company_search.png)
-
-- Search by company name or CEO name
-- Real-time filtering and results display
-- Sortable table with key company metrics
-- Displays: company name, ticker, CEO, founded year, domain, industry, headquarters, market cap, revenue
-
-### 🌐 REST API
-
-![REST API](images/feature_api.png)
-
-FastAPI-based RESTful API with comprehensive endpoints:
-- `GET /api/v1/companies` - Search and retrieve companies with filtering
-- `GET /api/v1/companies/{id}` - Get specific company by ID
-- `GET /api/v1/statistics` - Dataset statistics and distributions
-- `GET /api/v1/industries` - List of all industries
-- `GET /api/v1/countries` - List of all countries
-
-**Interactive Documentation**: Available at `/docs` endpoint with Swagger UI
 
 ## API Documentation
 

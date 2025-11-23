@@ -35,11 +35,13 @@ wheels/
 *.swo
 *~
 
-# Data files
+# Data files (but allow website data for GitHub Pages)
 data/
+!website/data/
+!website/data/marts/
+!website/data/marts/*.json
 *.csv
 *.parquet
-*.json
 *.xlsx
 *.xls
 

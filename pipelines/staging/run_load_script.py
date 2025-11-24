@@ -120,8 +120,11 @@ def execute_sql_file(conn, sql_file_path: Path):
             try:
                 cursor.execute(statement)
                 
-                # Try to fetch results if it's a SELECT statement
-                if statement.strip().upper().startswith('SELECT') or statement.strip().upper().startswith('SHOW') or statement.strip().upper().startswith('LIST') or statement.strip().upper().startswith('DESCRIBE'):
+                # Try to fetch results if it's a query statement
+                statement_upper = statement.strip().upper()
+                query_keywords = ('SELECT', 'SHOW', 'LIST', 'DESCRIBE', 'DESC')
+                is_query = any(statement_upper.startswith(keyword) for keyword in query_keywords)
+                if is_query:
                     rows = cursor.fetchall()
                     if rows:
                         logger.info(f"Result ({len(rows)} rows):")
@@ -182,18 +185,21 @@ def main():
         results = execute_sql_file(conn, sql_file)
         
         # Summary
+        successful_count = sum(1 for r in results if r[1] is not None and not isinstance(r[1], str))
+        error_count = sum(1 for r in results if isinstance(r[1], str))
+        
         logger.info("\n" + "="*60)
         logger.info("Execution Summary")
         logger.info("="*60)
         logger.info(f"Total statements: {len(results)}")
-        logger.info(f"Successful: {sum(1 for r in results if r[1] is not None and not isinstance(r[1], str))}")
-        logger.info(f"Errors: {sum(1 for r in results if isinstance(r[1], str))}")
+        logger.info(f"Successful: {successful_count}")
+        logger.info(f"Errors: {error_count}")
         
         conn.close()
-        logger.info("\n✅ Script execution completed!")
+        logger.info("\nScript execution completed successfully")
         
     except Exception as e:
-        logger.error(f"\n❌ Failed to execute script: {e}", exc_info=True)
+        logger.error(f"\nFailed to execute script: {e}", exc_info=True)
         sys.exit(1)
 
 

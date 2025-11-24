@@ -51,6 +51,8 @@
 
 **Official Website**: <https://coresheep.github.io/company-atlas/>
 
+**GitHub Source Code**: <https://github.com/CoreSheep/company-atlas>
+
 </div>
 
 <br>

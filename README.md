@@ -401,7 +401,30 @@ cd dbt
 dbt deps
 ```
 
-5. Run data pipeline:
+5. Set up Airflow for workflow orchestration:
+```bash
+# Install Docker and Docker Compose (if not already installed)
+# For macOS: brew install docker docker-compose
+# For Linux: sudo apt-get install docker.io docker-compose
+
+# Initialize Airflow database (first time only)
+docker-compose up airflow-init
+
+# Start Airflow services
+docker-compose up -d
+
+# Access Airflow web UI at http://localhost:8080
+# Default credentials: airflow / airflow
+```
+
+6. Run data pipeline:
+
+**Option A: Using Airflow (Recommended)**
+- Open Airflow web UI at http://localhost:8080
+- Unpause the `company_atlas_pipeline` DAG
+- Trigger the DAG to run the complete pipeline automatically
+
+**Option B: Manual execution**
 ```bash
 # Download datasets
 python pipelines/ingestion/main_ingestion.py

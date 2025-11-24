@@ -3,7 +3,7 @@ Apache Airflow DAG for Company Atlas data pipeline.
 
 This DAG orchestrates the complete data pipeline:
 1. Data Ingestion: Kaggle datasets + Web crawler enrichment
-2. S3 Upload: Upload raw CSV files to S3
+2. S3 Upload: Upload raw CSV/Parquet files to S3
 3. Snowflake Staging: Load data from S3 to Snowflake staging tables
 4. dbt Raw Layer: Initial data cleaning and normalization
 5. dbt Bronze Layer: Data quality validation and standardization

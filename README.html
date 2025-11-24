@@ -493,7 +493,8 @@ code {
 <li>Raw data files (CSV format) are uploaded to AWS S3 buckets</li>
 <li>Files are organized by source: <code>fortune1000/</code> and <code>global_companies/</code></li>
 </ul>
-<p><strong>Snowflake Staging:</strong></p>
+<p><strong>Snowflake Staging:</strong>
+<img src="images/snowflake.png" alt="Snowflake Schemas"></p>
 <ul>
 <li>Data is loaded from S3 to Snowflake staging tables using external stages</li>
 <li><code>COPY INTO</code> commands with proper file format configurations (CSV with header parsing)</li>

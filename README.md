@@ -5,8 +5,6 @@
   <h1 style="margin: 0; display: inline-block; text-decoration: none; border-bottom: none;">Company Atlas</h1>
 </div>
 
----
-
 **A unified firmographic data platform with thousands of companies from open-source datasets**
 
 <br>
@@ -159,6 +157,8 @@ FastAPI-based RESTful API with comprehensive endpoints:
 - Files are organized by source: `fortune1000/` and `global_companies/`
 
 **Snowflake Staging:**
+![Snowflake Schemas](images/snowflake.png)
+
 - Data is loaded from S3 to Snowflake staging tables using external stages
 - `COPY INTO` commands with proper file format configurations (CSV with header parsing)
 - Staging tables: `STG_FORTUNE1000`, `STG_GLOBAL_COMPANIES`

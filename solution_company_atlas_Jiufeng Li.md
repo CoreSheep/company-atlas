@@ -5,6 +5,8 @@
   <h1 style="margin: 0; display: inline-block; text-decoration: none; border-bottom: none;">Company Atlas</h1>
 </div>
 
+---
+
 **A unified firmographic data platform with thousands of companies from open-source datasets**
 
 <br>
@@ -55,7 +57,7 @@
 
 <div align="center">
 
-<img src="images/company-atlas-main.png" alt="Company Atlas Main Page" width="600">
+<img src="images/company-atlas-main.png" alt="Company Atlas Main Page">
 
 </div>
 
@@ -78,7 +80,11 @@ Company Atlas collects, cleans, and normalizes firmographic data from multiple s
 
 ## Architecture
 
-<img src="images/architecture.png" alt="Company Atlas Architecture" width="600">
+<div align="center">
+
+<img src="images/architecture.png" alt="Company Atlas Architecture">
+
+</div>
 
 The architecture diagram above illustrates the complete data pipeline flow from data sources to the final user-facing website. The system integrates multiple components:
 
@@ -94,7 +100,11 @@ The architecture diagram above illustrates the complete data pipeline flow from 
 
 ### Statistics Dashboard
 
-<img src="images/feature_statistics.png" alt="Statistics Dashboard" width="500">
+<div align="center">
+
+<img src="images/feature_statistics.png" alt="Statistics Dashboard">
+
+</div>
 
 - **Total Companies**: Count of all companies in the dataset
 - **Total Revenue**: Aggregate revenue across all companies
@@ -103,7 +113,11 @@ The architecture diagram above illustrates the complete data pipeline flow from 
 
 ### Company Profiles
 
-<img src="images/feature_companies.png" alt="Company Profiles" width="500">
+<div align="center">
+
+<img src="images/feature_companies.png" alt="Company Profiles">
+
+</div>
 
 - **Top Companies by Market Cap**: Display of leading companies with logos
 - **Company Details**: Market cap, Fortune rank, industry, revenue, employees, founded year
@@ -121,7 +135,11 @@ Interactive carousel with multiple visualizations:
 
 ### Interactive Search
 
-<img src="images/feature_company_search.png" alt="Company Search" width="500">
+<div align="center">
+
+<img src="images/feature_company_search.png" alt="Company Search">
+
+</div>
 
 - Search by company name or CEO name
 - Real-time filtering and results display
@@ -130,7 +148,11 @@ Interactive carousel with multiple visualizations:
 
 ### REST API
 
-<img src="images/feature_api.png" alt="REST API" width="500">
+<div align="center">
+
+<img src="images/feature_api.png" alt="REST API">
+
+</div>
 
 FastAPI-based RESTful API with comprehensive endpoints:
 - `GET /api/v1/companies` - Search and retrieve companies with filtering
@@ -157,7 +179,12 @@ FastAPI-based RESTful API with comprehensive endpoints:
 - Files are organized by source: `fortune1000/` and `global_companies/`
 
 **Snowflake Staging:**
-<img src="images/snowflake.png" alt="Snowflake Schemas" width="500">
+
+<div align="center">
+
+<img src="images/snowflake.png" alt="Snowflake Schemas">
+
+</div>
 
 - Data is loaded from S3 to Snowflake staging tables using external stages
 - `COPY INTO` commands with proper file format configurations (CSV with header parsing)
@@ -165,7 +192,11 @@ FastAPI-based RESTful API with comprehensive endpoints:
 
 ### 3. Data Modeling and Transformation with dbt
 
-<img src="images/dbt_docs.png" alt="dbt Documentation" width="500">
+<div align="center">
+
+<img src="images/dbt_docs.png" alt="dbt Documentation">
+
+</div>
 
 **Transformation Layers:**
 - **Raw Layer**: Initial data cleaning and normalization
@@ -199,7 +230,12 @@ FastAPI-based RESTful API with comprehensive endpoints:
     - Schema validation and data type enforcement
 
 **Data Lineage:**
-<img src="images/dbt_lineage_graph.png" alt="dbt Lineage Graph" width="500">
+
+<div align="center">
+
+<img src="images/dbt_lineage_graph.png" alt="dbt Lineage Graph">
+
+</div>
 
 The lineage graph above shows the complete data flow from staging tables through raw, bronze, and marts layers, demonstrating how data is transformed and validated at each stage.
 

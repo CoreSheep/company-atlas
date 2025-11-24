@@ -55,7 +55,7 @@
 
 <div align="center">
 
-<img src="images/company-atlas-main.png" alt="Company Atlas Main Page" width="600">
+<img src="images/company-atlas-main.png" alt="Company Atlas Main Page">
 
 </div>
 
@@ -80,7 +80,7 @@ Company Atlas collects, cleans, and normalizes firmographic data from multiple s
 
 <div align="center">
 
-<img src="images/architecture.png" alt="Company Atlas Architecture" width="600">
+<img src="images/architecture.png" alt="Company Atlas Architecture">
 
 </div>
 
@@ -100,7 +100,7 @@ The architecture diagram above illustrates the complete data pipeline flow from 
 
 <div align="center">
 
-<img src="images/feature_statistics.png" alt="Statistics Dashboard" width="500">
+<img src="images/feature_statistics.png" alt="Statistics Dashboard">
 
 </div>
 
@@ -113,7 +113,7 @@ The architecture diagram above illustrates the complete data pipeline flow from 
 
 <div align="center">
 
-<img src="images/feature_companies.png" alt="Company Profiles" width="500">
+<img src="images/feature_companies.png" alt="Company Profiles">
 
 </div>
 
@@ -135,7 +135,7 @@ Interactive carousel with multiple visualizations:
 
 <div align="center">
 
-<img src="images/feature_company_search.png" alt="Company Search" width="500">
+<img src="images/feature_company_search.png" alt="Company Search">
 
 </div>
 
@@ -148,7 +148,7 @@ Interactive carousel with multiple visualizations:
 
 <div align="center">
 
-<img src="images/feature_api.png" alt="REST API" width="500">
+<img src="images/feature_api.png" alt="REST API">
 
 </div>
 
@@ -180,7 +180,7 @@ FastAPI-based RESTful API with comprehensive endpoints:
 
 <div align="center">
 
-<img src="images/snowflake.png" alt="Snowflake Schemas" width="500">
+<img src="images/snowflake.png" alt="Snowflake Schemas">
 
 </div>
 
@@ -192,7 +192,7 @@ FastAPI-based RESTful API with comprehensive endpoints:
 
 <div align="center">
 
-<img src="images/dbt_docs.png" alt="dbt Documentation" width="500">
+<img src="images/dbt_docs.png" alt="dbt Documentation">
 
 </div>
 
@@ -231,7 +231,7 @@ FastAPI-based RESTful API with comprehensive endpoints:
 
 <div align="center">
 
-<img src="images/dbt_lineage_graph.png" alt="dbt Lineage Graph" width="500">
+<img src="images/dbt_lineage_graph.png" alt="dbt Lineage Graph">
 
 </div>
 

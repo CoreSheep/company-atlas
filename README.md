@@ -1,7 +1,7 @@
 <div align="center">
 
 <div style="display: flex; align-items: center; justify-content: center; gap: 1.5rem; margin-bottom: 1rem;">
-  <img src="website/assets/favicon.svg" alt="Company Atlas Logo" width="100" height="100" style="display: block;">
+  <img src="website/assets/favicon.svg" alt="Company Atlas Logo" width="60" height="60" style="display: block;">
   <h1 style="margin: 0; display: inline-block; text-decoration: none; border-bottom: none;">Company Atlas</h1>
 </div>
 
@@ -47,7 +47,7 @@
 
 **Author**: [Jiufeng Li](https://jiufengblog.web.app/) • **Year**: 2025
 
-🌐 **Official Website**: <https://coresheep.github.io/company-atlas/>
+**Official Website**: <https://coresheep.github.io/company-atlas/>
 
 </div>
 
@@ -55,13 +55,13 @@
 
 <div align="center">
 
-![Company Atlas Main Page](images/company-atlas-main.png)
+<img src="images/company-atlas-main.png" alt="Company Atlas Main Page" width="600">
 
 </div>
 
 </div>
 
-## 📋 Overview
+## Overview
 
 Company Atlas collects, cleans, and normalizes firmographic data from multiple sources, producing an analytics-ready dataset with thousands of companies worldwide. The platform features an elegant interactive website, live dashboards, and a comprehensive REST API for data access.
 
@@ -69,16 +69,20 @@ Company Atlas collects, cleans, and normalizes firmographic data from multiple s
 
 ### Key Highlights
 
-- 🎯 **Multi-Source Data**: Combines Kaggle Fortune 1000 dataset with web crawler enrichment
-- 🔄 **Automated Pipeline**: End-to-end data processing with Airflow orchestration
-- ✅ **Data Quality**: Comprehensive validation with dbt tests and Great Expectations
-- 📊 **Interactive Dashboards**: Real-time visualizations and company profiles
-- 🌐 **REST API**: FastAPI-based API with interactive documentation
-- 🚀 **Production Ready**: Deployed on GitHub Pages with CI/CD automation
+- **Multi-Source Data**: Combines Kaggle Fortune 1000 dataset with web crawler enrichment
+- **Automated Pipeline**: End-to-end data processing with Airflow orchestration
+- **Data Quality**: Comprehensive validation with dbt tests and Great Expectations
+- **Interactive Dashboards**: Real-time visualizations and company profiles
+- **REST API**: FastAPI-based API with interactive documentation
+- **Production Ready**: Deployed on GitHub Pages with CI/CD automation
 
-## 🏗️ Architecture
+## Architecture
 
-![Company Atlas Architecture](images/architecture.png)
+<div align="center">
+
+<img src="images/architecture.png" alt="Company Atlas Architecture" width="600">
+
+</div>
 
 The architecture diagram above illustrates the complete data pipeline flow from data sources to the final user-facing website. The system integrates multiple components:
 
@@ -90,26 +94,34 @@ The architecture diagram above illustrates the complete data pipeline flow from 
 - **Data Transformation**: dbt for modeling, transformation, validation, and marts creation
 - **API & Presentation**: FastAPI REST API and Company Atlas Website
 
-## ✨ Features
+## Features
 
-### 📊 Statistics Dashboard
+### Statistics Dashboard
 
-![Statistics Dashboard](images/feature_statistics.png)
+<div align="center">
+
+<img src="images/feature_statistics.png" alt="Statistics Dashboard" width="500">
+
+</div>
 
 - **Total Companies**: Count of all companies in the dataset
 - **Total Revenue**: Aggregate revenue across all companies
 - **Industries**: Number of unique industries
 - **Average Employees**: Mean employee count
 
-### 🏢 Company Profiles
+### Company Profiles
 
-![Company Profiles](images/feature_companies.png)
+<div align="center">
+
+<img src="images/feature_companies.png" alt="Company Profiles" width="500">
+
+</div>
 
 - **Top Companies by Market Cap**: Display of leading companies with logos
 - **Company Details**: Market cap, Fortune rank, industry, revenue, employees, founded year
 - **Interactive Cards**: Elegant company profile cards with visual hierarchy
 
-### 📈 Live Dashboards
+### Live Dashboards
 
 Interactive carousel with multiple visualizations:
 - **Top Industries**: Bar chart showing industry distribution
@@ -119,18 +131,26 @@ Interactive carousel with multiple visualizations:
 - **Revenue % Change**: Year-over-year revenue growth/decline
 - **Revenue Growth & Decline**: Combined visualization of top performers
 
-### 🔍 Interactive Search
+### Interactive Search
 
-![Company Search](images/feature_company_search.png)
+<div align="center">
+
+<img src="images/feature_company_search.png" alt="Company Search" width="500">
+
+</div>
 
 - Search by company name or CEO name
 - Real-time filtering and results display
 - Sortable table with key company metrics
 - Displays: company name, ticker, CEO, founded year, domain, industry, headquarters, market cap, revenue
 
-### 🌐 REST API
+### REST API
 
-![REST API](images/feature_api.png)
+<div align="center">
+
+<img src="images/feature_api.png" alt="REST API" width="500">
+
+</div>
 
 FastAPI-based RESTful API with comprehensive endpoints:
 - `GET /api/v1/companies` - Search and retrieve companies with filtering
@@ -141,7 +161,7 @@ FastAPI-based RESTful API with comprehensive endpoints:
 
 **Interactive Documentation**: Available at `/docs` endpoint with Swagger UI
 
-## 🔄 Data Pipelines
+## Data Pipelines
 
 ### 1. Data Collection
 
@@ -153,19 +173,28 @@ FastAPI-based RESTful API with comprehensive endpoints:
 ### 2. Data Ingestion
 
 **S3 Storage:**
-- Raw data files (CSV format) are uploaded to AWS S3 buckets
+- Raw data files (CSV and Parquet formats) are uploaded to AWS S3 buckets
 - Files are organized by source: `fortune1000/` and `global_companies/`
 
 **Snowflake Staging:**
-![Snowflake Schemas](images/snowflake.png)
+
+<div align="center">
+
+<img src="images/snowflake.png" alt="Snowflake Schemas" width="500">
+
+</div>
 
 - Data is loaded from S3 to Snowflake staging tables using external stages
 - `COPY INTO` commands with proper file format configurations (CSV with header parsing)
 - Staging tables: `STG_FORTUNE1000`, `STG_GLOBAL_COMPANIES`
 
-### 3. Data Modeling with dbt
+### 3. Data Modeling and Transformation with dbt
 
-![dbt Documentation](images/dbt_docs.png)
+<div align="center">
+
+<img src="images/dbt_docs.png" alt="dbt Documentation" width="500">
+
+</div>
 
 **Transformation Layers:**
 - **Raw Layer**: Initial data cleaning and normalization
@@ -183,9 +212,28 @@ FastAPI-based RESTful API with comprehensive endpoints:
   - Not null constraints on key fields
   - Range validation (e.g., Fortune rank 1-1000)
   - Relationship integrity checks
+- Comprehensive validation using Great Expectations:
+  - **Raw Layer Validation**: Validates `raw_dim_companies` and `raw_fct_company_metrics`
+    - Column existence checks (company_id, company_name, source_system)
+    - Not null constraints on key fields (mostly 95-99% threshold)
+    - Range validation: founded_year (1800-2030), fortune_rank (1-1000)
+  - **Bronze Layer Validation**: Validates `bronze_dim_companies` and `bronze_fct_company_metrics`
+    - Uniqueness checks on company_id and company_name (mostly 99% threshold)
+    - Enhanced data quality with stricter not null constraints
+    - Range validation: founded_year, fortune_rank, employee_count (>= 0)
+  - **Marts Layer Validation**: Validates `unified_companies` (analytics-ready data)
+    - Uniqueness checks on company_id and company_name
+    - Not null constraints on country, source_system
+    - Range validation: founded_year, fortune_rank, employee_count
+    - Schema validation and data type enforcement
 
 **Data Lineage:**
-![dbt Lineage Graph](images/dbt_lineage_graph.png)
+
+<div align="center">
+
+<img src="images/dbt_lineage_graph.png" alt="dbt Lineage Graph" width="500">
+
+</div>
 
 The lineage graph above shows the complete data flow from staging tables through raw, bronze, and marts layers, demonstrating how data is transformed and validated at each stage.
 
@@ -231,7 +279,7 @@ dbt Bronze → GE Bronze → dbt Marts → GE Marts → dbt Tests → Website Do
 - Interactive search functionality
 - Responsive design for mobile and desktop
 
-## 📚 API Documentation
+## API Documentation
 
 Full API documentation is available on the website:
 
@@ -276,7 +324,7 @@ curl "http://localhost:8000/api/v1/companies?company_name=Apple"
 curl "http://localhost:8000/api/v1/companies/{company_id}"
 ```
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Data Collection**: Kaggle API, Web Scraping (httpx, BeautifulSoup, trio)
 - **Cloud Storage**: AWS S3
@@ -287,7 +335,7 @@ curl "http://localhost:8000/api/v1/companies/{company_id}"
 - **Frontend**: HTML5, CSS3, JavaScript, Chart.js
 - **Deployment**: GitHub Pages
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 company-atlas/
@@ -319,7 +367,7 @@ company-atlas/
 └── requirements.txt       # Python dependencies
 ```
 
-## 🚀 Setup
+## Setup
 
 ### Prerequisites
 
@@ -370,7 +418,7 @@ dbt run
 dbt test
 ```
 
-## 📖 Citation
+## Citation
 
 If you use Company Atlas in your research or project, please cite:
 
@@ -383,7 +431,7 @@ Li, J. (2025). Company Atlas: A Unified Firmographic Data Platform.
 **Project Website**: <https://coresheep.github.io/company-atlas/>  
 **Year**: 2025
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 

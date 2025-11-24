@@ -15,6 +15,10 @@ services:
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
       - ./pipelines:/opt/airflow/pipelines
+      - ./dbt:/opt/airflow/dbt
+      - ./data:/opt/airflow/data
+      - ./great_expectations:/opt/airflow/great_expectations
+      - ./.env:/opt/airflow/.env
     ports:
       - "8080:8080"
     command: webserver
@@ -39,6 +43,10 @@ services:
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
       - ./pipelines:/opt/airflow/pipelines
+      - ./dbt:/opt/airflow/dbt
+      - ./data:/opt/airflow/data
+      - ./great_expectations:/opt/airflow/great_expectations
+      - ./.env:/opt/airflow/.env
     command: scheduler
     depends_on:
       - postgres
@@ -57,25 +65,6 @@ services:
       timeout: 5s
       retries: 5
 
-  neo4j:
-    image: neo4j:5.15.0
-    environment:
-      - NEO4J_AUTH=neo4j/password
-      - NEO4J_PLUGINS=["apoc"]
-    ports:
-      - "7474:7474"
-      - "7687:7687"
-    volumes:
-      - neo4j-data:/data
-      - neo4j-logs:/logs
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:7474"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
 volumes:
   postgres-db-volume:
-  neo4j-data:
-  neo4j-logs:
 

@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="website/assets/favicon.svg" alt="Company Atlas Logo" width="100" height="100" style="transform: rotate(180deg);">
+<img src="website/assets/favicon.svg" alt="Company Atlas Logo" width="100" height="100">
 
 # Company Atlas
 
@@ -20,6 +20,8 @@
 
 **Author**: [Jiufeng Li](https://jiufengblog.web.app/) • **Year**: 2025
 
+🌐 **Official Website**: [https://coresheep.github.io/company-atlas/](https://coresheep.github.io/company-atlas/)
+
 ![Company Atlas Main Page](images/company-atlas-main.png)
 
 </div>
@@ -27,6 +29,8 @@
 ## 📋 Overview
 
 Company Atlas collects, cleans, and normalizes firmographic data from multiple sources, producing an analytics-ready dataset with thousands of companies worldwide. The platform features an elegant interactive website, live dashboards, and a comprehensive REST API for data access.
+
+> **Note**: Currently, the dataset contains the top 1000 Fortune American companies. In the future, we plan to expand the dataset to include more companies worldwide.
 
 ### Key Highlights
 
@@ -39,20 +43,17 @@ Company Atlas collects, cleans, and normalizes firmographic data from multiple s
 
 ## 🏗️ Architecture
 
-```
-┌─────────────┐     ┌─────────────┐     ┌──────────┐     ┌──────────┐
-│   Kaggle    │     │      S3     │     │Snowflake │     │   dbt    │
-│  Datasets   │────▶│  (Raw Data) │────▶│ (Staging)│────▶│(Modeling)│
-│             │     │             │     │          │     │          │
-│ Web Crawler │     │    CSV      │     │  Tables  │     │  Models  │
-└─────────────┘     └─────────────┘     └──────────┘     └──────────┘
-                                                              │
-                                                              ▼
-┌─────────────┐     ┌─────────────┐     ┌──────────┐     ┌──────────┐
-│  Airflow    │────▶│  dbt Tests  │     │  FastAPI │     │  Website │
-│(Orchestr.)  │     │  (Quality)  │     │  (REST)  │     │  (Pages) │
-└─────────────┘     └─────────────┘     └──────────┘     └──────────┘
-```
+![Company Atlas Architecture](images/architecture.png)
+
+The architecture diagram above illustrates the complete data pipeline flow from data sources to the final user-facing website. The system integrates multiple components:
+
+- **Data Sources**: Kaggle open-source datasets and Python web crawlers
+- **Cloud Storage**: Amazon Web Services S3 for raw data storage
+- **Data Warehouse**: Snowflake for staging and data warehousing
+- **Data Pipelines**: Staging → Raw → Bronze → Marts (dbt transformation layers)
+- **Orchestration**: Apache Airflow for workflow automation
+- **Data Transformation**: dbt for modeling, transformation, validation, and marts creation
+- **API & Presentation**: FastAPI REST API and Company Atlas Website
 
 ## ✨ Features
 
@@ -127,6 +128,8 @@ FastAPI-based RESTful API with comprehensive endpoints:
 
 ### 3. Data Modeling with dbt
 
+![dbt Documentation](images/dbt_docs.png)
+
 **Transformation Layers:**
 - **Raw Layer**: Initial data cleaning and normalization
   - `raw_dim_companies`: Unified company dimension table
@@ -144,16 +147,35 @@ FastAPI-based RESTful API with comprehensive endpoints:
   - Range validation (e.g., Fortune rank 1-1000)
   - Relationship integrity checks
 
+**Data Lineage:**
+![dbt Lineage Graph](images/dbt_lineage_graph.png)
+
+The lineage graph above shows the complete data flow from staging tables through raw, bronze, and marts layers, demonstrating how data is transformed and validated at each stage.
+
 ### 4. Orchestration
 
 **Apache Airflow:**
-- Automated workflow scheduling for the entire pipeline
-- DAGs coordinate:
-  - Data collection from Kaggle and web crawler
-  - S3 uploads
-  - Snowflake data loading
-  - dbt model execution
-  - Data quality testing
+- Automated workflow scheduling for the entire pipeline (daily schedule)
+- DAG: `company_atlas_pipeline` orchestrates the complete data flow
+
+**Pipeline Workflow:**
+1. **Data Ingestion**: Kaggle datasets + Web crawler enrichment
+2. **S3 Upload**: Upload raw CSV files to AWS S3
+3. **Snowflake Staging**: Load data from S3 to Snowflake staging tables (`STG_FORTUNE1000`, `STG_GLOBAL_COMPANIES`)
+4. **dbt Raw Layer**: Run raw layer models for initial data cleaning and normalization
+5. **Great Expectations Raw Validation**: Validate raw layer data quality
+6. **dbt Bronze Layer**: Run bronze layer models for data quality validation and standardization
+7. **Great Expectations Bronze Validation**: Validate bronze layer data quality
+8. **dbt Marts Layer**: Run marts layer models to create analytics-ready unified tables
+9. **Great Expectations Marts Validation**: Validate marts layer data quality
+10. **dbt Tests**: Run comprehensive data quality tests
+11. **Website Data Download**: Download unified companies data for website visualization
+
+**Task Dependencies:**
+```
+Ingestion → S3 Upload → Snowflake Staging → dbt Raw → GE Raw → 
+dbt Bronze → GE Bronze → dbt Marts → GE Marts → dbt Tests → Website Download
+```
 
 ### 5. Data Transformation
 

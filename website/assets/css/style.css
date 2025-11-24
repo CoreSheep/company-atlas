@@ -84,7 +84,6 @@ body {
     flex-shrink: 0;
     transition: transform 0.2s ease;
     vertical-align: middle;
-    transform: rotate(180deg);
 }
 
 .nav-brand span {
@@ -94,7 +93,7 @@ body {
 }
 
 .nav-brand:hover img {
-    transform: rotate(180deg) scale(1.05);
+    transform: scale(1.05);
 }
 
 .nav-menu {

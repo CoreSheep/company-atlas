@@ -96,6 +96,24 @@ async function loadCharts() {
     }
 }
 
+// Extract domain from website URL
+function extractDomain(websiteUrl) {
+    if (!websiteUrl) return null;
+    try {
+        // Remove protocol (http://, https://)
+        let domain = websiteUrl.replace(/^https?:\/\//, '');
+        // Remove www.
+        domain = domain.replace(/^www\./, '');
+        // Remove path and query string
+        domain = domain.split('/')[0];
+        // Remove port if present
+        domain = domain.split(':')[0];
+        return domain;
+    } catch (e) {
+        return null;
+    }
+}
+
 // Map company names to logo filenames
 function getCompanyLogo(companyName) {
     const logoMap = {
@@ -154,9 +172,9 @@ async function loadCompanyProfiles() {
                             <span class="company-stat-label">Fortune Rank</span>
                             <span class="company-stat-value">#${company.fortune_rank}</span>
                         </div>` : ''}
-                        ${company.industry ? `<div class="company-stat">
-                            <span class="company-stat-label">Industry</span>
-                            <span class="company-stat-value">${escapeHtml(company.industry)}</span>
+                        ${company.domain ? `<div class="company-stat">
+                            <span class="company-stat-label">Domain</span>
+                            <span class="company-stat-value">${escapeHtml(company.domain)}</span>
                         </div>` : ''}
                         ${company.revenue ? `<div class="company-stat">
                             <span class="company-stat-label">Revenue</span>

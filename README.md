@@ -1,28 +1,65 @@
 <div align="center">
 
-<img src="website/assets/favicon.svg" alt="Company Atlas Logo" width="100" height="100">
+<div style="display: flex; align-items: center; justify-content: center; gap: 1.5rem; margin-bottom: 1rem;">
+  <img src="website/assets/favicon.svg" alt="Company Atlas Logo" width="100" height="100" style="display: block;">
+  <h1 style="margin: 0; display: inline-block; text-decoration: none; border-bottom: none;">Company Atlas</h1>
+</div>
 
-# Company Atlas
+---
 
 **A unified firmographic data platform with thousands of companies from open-source datasets**
 
+<br>
+
+<div align="center">
+
 [![Website](https://img.shields.io/badge/Website-Live-brightgreen?style=for-the-badge&logo=github)](https://coresheep.github.io/company-atlas/)
+&nbsp;
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+&nbsp;
 [![Author](https://img.shields.io/badge/Author-Jiufeng%20Li-FF6B6B?style=for-the-badge)](https://jiufengblog.web.app/)
 
+</div>
+
+<br>
+
+<div align="center">
+
 [![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+&nbsp;
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+&nbsp;
 [![dbt](https://img.shields.io/badge/dbt-FF694B?style=for-the-badge&logo=dbt&logoColor=white)](https://www.getdbt.com/)
+&nbsp;
 [![Apache Airflow](https://img.shields.io/badge/Airflow-017CEE?style=for-the-badge&logo=apacheairflow&logoColor=white)](https://airflow.apache.org/)
+&nbsp;
+[![Great Expectations](https://img.shields.io/badge/Great%20Expectations-FF6B9D?style=for-the-badge&logo=great-expectations&logoColor=white)](https://greatexpectations.io/)
+&nbsp;
 [![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
+&nbsp;
 [![Snowflake](https://img.shields.io/badge/Snowflake-29B5E8?style=for-the-badge&logo=snowflake&logoColor=white)](https://www.snowflake.com/)
+&nbsp;
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge&logo=github&logoColor=white)](https://pages.github.com/)
+
+</div>
+
+<br>
+
+<div align="center">
 
 **Author**: [Jiufeng Li](https://jiufengblog.web.app/) • **Year**: 2025
 
-🌐 **Official Website**: [https://coresheep.github.io/company-atlas/](https://coresheep.github.io/company-atlas/)
+🌐 **Official Website**: <https://coresheep.github.io/company-atlas/>
+
+</div>
+
+<br>
+
+<div align="center">
 
 ![Company Atlas Main Page](images/company-atlas-main.png)
+
+</div>
 
 </div>
 
@@ -198,9 +235,9 @@ dbt Bronze → GE Bronze → dbt Marts → GE Marts → dbt Tests → Website Do
 
 Full API documentation is available on the website:
 
-- **Website Documentation**: [https://coresheep.github.io/company-atlas/docs/api.html](https://coresheep.github.io/company-atlas/docs/api.html)
-- **Interactive API Docs**: `http://localhost:8000/docs` (when running locally)
-- **ReDoc**: `http://localhost:8000/redoc` (when running locally)
+- **Website Documentation**: <https://coresheep.github.io/company-atlas/docs/api.html>
+- **Interactive API Docs**: <http://localhost:8000/docs> (when running locally)
+- **ReDoc**: <http://localhost:8000/redoc> (when running locally)
 
 ### Example Usage
 
@@ -339,15 +376,15 @@ If you use Company Atlas in your research or project, please cite:
 
 ```
 Li, J. (2025). Company Atlas: A Unified Firmographic Data Platform. 
-https://coresheep.github.io/company-atlas/
+<https://coresheep.github.io/company-atlas/>
 ```
 
-**Author**: Jiufeng Li ([https://jiufengblog.web.app/](https://jiufengblog.web.app/))  
-**Project Website**: [https://coresheep.github.io/company-atlas/](https://coresheep.github.io/company-atlas/)  
+**Author**: [Jiufeng Li](https://jiufengblog.web.app/)  
+**Project Website**: <https://coresheep.github.io/company-atlas/>  
 **Year**: 2025
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Copyright (c) 2025 Jiufeng Li ([https://jiufengblog.web.app/](https://jiufengblog.web.app/))
+Copyright (c) 2025 [Jiufeng Li](https://jiufengblog.web.app/)

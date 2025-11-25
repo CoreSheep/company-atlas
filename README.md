@@ -86,7 +86,7 @@ Company Atlas collects, cleans, and normalizes firmographic data from multiple s
 
 The architecture diagram above illustrates the complete data pipeline flow from data sources to the final user-facing website. The system integrates multiple components:
 
-- **Data Sources**: Kaggle open-source datasets and Python web crawlers
+- **Data Sources**: Kaggle open-source datasets (e.g., [2024 Fortune 1000 Companies](https://www.kaggle.com/datasets/jeannicolasduval/2024-fortune-1000-companies)) and Python web crawlers
 - **Cloud Storage**: Amazon Web Services S3 for raw data storage
 - **Data Warehouse**: Snowflake for staging and data warehousing
 - **Data Pipelines**: Staging → Raw → Bronze → Marts (dbt transformation layers)
@@ -339,32 +339,56 @@ curl "http://localhost:8000/api/v1/companies/{company_id}"
 
 ```
 company-atlas/
-├── pipelines/              # Data pipeline scripts
-│   ├── ingestion/         # Data ingestion (Kaggle, web crawler)
+├── airflow/               # Apache Airflow orchestration
+│   └── dags/             # Airflow DAG definitions
+│       └── company_atlas_pipeline.py
+├── pipelines/             # Data pipeline scripts
+│   ├── ingestion/        # Data ingestion (Kaggle, web crawler)
+│   │   ├── main_ingestion.py
+│   │   ├── kaggle_ingestion.py
+│   │   └── web_scraper.py
 │   ├── staging/           # S3 to Snowflake loading
-│   └── website/           # Logo fetching and website utilities
-├── dbt/                   # dbt models and tests
+│   │   ├── upload_to_s3.py
+│   │   ├── run_load_script.py
+│   │   └── load_data_from_s3.sql
+│   ├── validation/       # Great Expectations validation
+│   │   └── great_expectations_setup.py
+│   ├── marts/            # Marts data download
+│   │   └── download_unified_companies.py
+│   └── website/          # Logo fetching and website utilities
+│       └── fetch_company_logos.py
+├── dbt/                  # dbt models and tests
 │   ├── models/
-│   │   ├── raw/           # Raw layer models
-│   │   ├── bronze/        # Bronze layer models
-│   │   └── marts/         # Analytics-ready marts
-│   └── schema.yml         # Schema definitions and tests
-├── api/                   # FastAPI REST API
+│   │   ├── raw/          # Raw layer models
+│   │   ├── bronze/       # Bronze layer models
+│   │   └── marts/        # Analytics-ready marts
+│   ├── tests/            # dbt test definitions
+│   │   ├── raw/
+│   │   ├── bronze/
+│   │   └── marts/
+│   ├── macros/           # dbt macros
+│   └── dbt_project.yml   # dbt configuration
+├── api/                  # FastAPI REST API
 │   ├── main.py
 │   └── models/
-├── website/               # GitHub Pages website
+├── website/              # GitHub Pages website
 │   ├── index.html
 │   ├── assets/
 │   │   ├── css/
 │   │   ├── js/
 │   │   └── logos/
+│   ├── data/             # Website data files
 │   └── docs/
 │       └── api.html
-├── data/                  # Local data storage
+├── data/                 # Local data storage
 │   ├── raw/              # Raw data files
 │   └── marts/            # Processed data
-├── images/                # Documentation images
-└── requirements.txt       # Python dependencies
+├── images/               # Documentation images
+├── architecture/         # Architecture diagrams
+├── docker-compose.yml    # Docker Compose configuration for Airflow
+├── LICENSE               # MIT License
+├── requirements.txt      # Python dependencies
+└── environment.yml       # Conda environment file
 ```
 
 ## Setup

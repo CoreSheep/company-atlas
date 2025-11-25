@@ -955,6 +955,17 @@ body {
     color: var(--color-primary);
 }
 
+.footer-copyright a {
+    color: var(--color-footer-text);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-copyright a:hover {
+    text-decoration: underline;
+    color: var(--color-footer-text);
+}
+
 .footer-link-highlight {
     display: inline-flex;
     align-items: center;

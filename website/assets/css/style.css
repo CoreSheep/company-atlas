@@ -466,6 +466,20 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
+.unified-grid .card {
+    text-align: center;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.unified-grid .card-icon {
+    font-size: 2.25rem;
+    margin: 0 auto 0.25rem;
+}
+
 /* Cards */
 .card {
     background: var(--color-card);
@@ -545,6 +559,19 @@ body {
 .stat-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.stats-section .stats-grid {
+    gap: 1.25rem;
+}
+
+.stats-section .stat-card {
+    padding: 1.5rem;
+    border-radius: 14px;
+}
+
+.stats-section .stat-value {
+    font-size: 2rem;
 }
 
 .stat-value {
@@ -685,6 +712,11 @@ body {
     position: relative;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 260px;
 }
 
 .feature-card::before {
@@ -741,6 +773,7 @@ body {
     font-size: 0.9375rem;
     line-height: 1.6;
     margin: 0;
+    text-align: center;
 }
 
 /* API Endpoints */

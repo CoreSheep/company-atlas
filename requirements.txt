@@ -18,6 +18,7 @@ cryptography==41.0.7
 # dbt
 dbt-core==1.7.7
 dbt-snowflake==1.7.1
+ruamel.yaml<0.18.0
 
 # Airflow
 apache-airflow==2.8.1

@@ -607,42 +607,7 @@ dbt deps
 cd ..
 ```
 
-#### 5. Run dbt models using the helper script:
-
-The `dbt/run_dbt.sh` script automatically loads environment variables from `~/.env`:
-
-Note: Make sure you specify the correct Snowflake private key path in the `~/.env` file.
-```bash
-SNOWFLAKE_PRIVATE_KEY_PATH=/path/to/your/rsa_key.p8
-```
-
-```bash
-cd dbt
-
-# Run all models and tests
-bash run_dbt.sh build
-
-# Run specific layer
-bash run_dbt.sh run --select raw
-bash run_dbt.sh run --select bronze
-bash run_dbt.sh run --select marts
-
-# Run tests for specific layer
-bash run_dbt.sh test --select raw
-bash run_dbt.sh test --select bronze
-bash run_dbt.sh test --select marts
-
-# Run all tests
-bash run_dbt.sh test
-
-# Run both models and tests
-bash run_dbt.sh build
-
-# Debug mode
-bash run_dbt.sh debug
-```
-
-#### 7. Run pipeline steps manually (alternative):
+#### 5. Run pipeline steps manually (alternative):
 
 ```bash
 # Step 1: Download datasets from Kaggle
@@ -675,7 +640,7 @@ cd ..
 python -c "from pipelines.validation.great_expectations_setup import GreatExpectationsValidator; v = GreatExpectationsValidator(); v.validate_all_layers()"
 ```
 
-#### 8. Start the API server (optional):
+#### 6. Start the API server (optional):
 ```bash
 cd api
 uvicorn main:app --reload --port 8000

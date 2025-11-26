@@ -91,4 +91,3 @@ select
     loaded_at
 from deduplicated
 where rn = 1
-

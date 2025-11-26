@@ -3,6 +3,22 @@ version: 2
 models:
   - name: bronze_dim_companies
     description: "Bronze dimension table with cleaned company master data from raw layer, applying data quality improvements and normalization"
+    meta:
+      tags:
+        - dimension
+        - company
+        - primary
+      owner:
+        name: Jiufeng Li
+        email: jiufeng.li@gmail.com
+      domain: company master data dimension table
+      source: raw
+      pii:
+        - false
+      sensitivity:
+        - low
+      sla:
+        - daily
     columns:
       - name: company_id
         description: "Unique identifier for company (MD5 hash)"
@@ -52,6 +68,23 @@ models:
 
   - name: bronze_fct_company_metrics
     description: "Bronze fact table with cleaned company metrics from raw layer, applying data quality improvements and standardization"
+    meta:
+      tags:
+        - fact
+        - company
+        - metrics
+        - financial
+      owner:
+        name: Jiufeng Li
+        email: jiufeng.li@gmail.com
+      domain: financial metrics fact table
+      source: raw
+      pii:
+        - false
+      sensitivity:
+        - medium
+      sla:
+        - daily
     columns:
       - name: company_id
         description: "Foreign key to bronze_dim_companies"
@@ -97,6 +130,22 @@ models:
 
   - name: bronze_dim_founder
     description: "Bronze dimension table with founder information extracted from staging data"
+    meta:
+      tags:
+        - dimension
+        - founder
+        - enrichment
+      owner:
+        name: Jiufeng Li
+        email: jiufeng.li@gmail.com
+      domain: founder enrichment dimension table
+      source: raw
+      pii:
+        - false
+      sensitivity:
+        - low
+      sla:
+        - daily
     columns:
       - name: id
         description: "Unique identifier for founder record (MD5 hash of company identifiers)"

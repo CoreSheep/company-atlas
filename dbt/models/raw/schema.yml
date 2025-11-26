@@ -3,6 +3,22 @@ version: 2
 models:
   - name: raw_dim_companies
     description: "Raw dimension table with company master data from staging tables, handling nulls and deduplication"
+    meta:
+      tags:
+        - dimension
+        - company
+        - primary
+      owner:
+        name: Jiufeng Li
+        email: jiufeng.li@gmail.com
+      domain: company master data dimension table
+      source: staging
+      pii:
+        - false
+      sensitivity:
+        - low
+      sla:
+        - daily
     columns:
       - name: company_id
         description: "Unique identifier for company (MD5 hash)"
@@ -53,6 +69,23 @@ models:
 
   - name: raw_fct_company_metrics
     description: "Raw fact table with company metrics and financial data from staging tables, handling nulls and deduplication"
+    meta:
+      tags:
+        - fact
+        - company
+        - metrics
+        - financial
+      owner:
+        name: Jiufeng Li
+        email: jiufeng.li@gmail.com
+      domain: financial metrics fact table
+      source: staging
+      pii:
+        - false
+      sensitivity:
+        - medium
+      sla:
+        - daily
     columns:
       - name: company_id
         description: "Foreign key to raw_dim_companies"

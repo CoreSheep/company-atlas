@@ -3,6 +3,22 @@ version: 2
 models:
   - name: unified_companies
     description: "Unified companies table with essential company attributes from bronze layer, containing only clean, business-ready columns"
+    meta:
+      tags:
+        - mart
+        - company
+        - primary
+      owner:
+        name: Jiufeng Li
+        email: jiufeng.li@gmail.com
+      domain: company mart table
+      source: bronze
+      pii:
+        - false
+      sensitivity:
+        - low
+      sla:
+        - daily
     columns:
       - name: company_id
         description: "Unique identifier for company"

@@ -1,56 +1,4 @@
-version: '3.8'
-
 services:
-  airflow-webserver:
-    image: apache/airflow:2.8.1
-    environment:
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
-      - AIRFLOW__CORE__FERNET_KEY=''
-      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=True
-      - AIRFLOW__CORE__LOAD_EXAMPLES=False
-      - AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.basic_auth
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/logs:/opt/airflow/logs
-      - ./airflow/plugins:/opt/airflow/plugins
-      - ./pipelines:/opt/airflow/pipelines
-      - ./dbt:/opt/airflow/dbt
-      - ./data:/opt/airflow/data
-      - ./great_expectations:/opt/airflow/great_expectations
-      - ./.env:/opt/airflow/.env
-    ports:
-      - "8080:8080"
-    command: webserver
-    depends_on:
-      - postgres
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-  airflow-scheduler:
-    image: apache/airflow:2.8.1
-    environment:
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
-      - AIRFLOW__CORE__FERNET_KEY=''
-      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=True
-      - AIRFLOW__CORE__LOAD_EXAMPLES=False
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/logs:/opt/airflow/logs
-      - ./airflow/plugins:/opt/airflow/plugins
-      - ./pipelines:/opt/airflow/pipelines
-      - ./dbt:/opt/airflow/dbt
-      - ./data:/opt/airflow/data
-      - ./great_expectations:/opt/airflow/great_expectations
-      - ./.env:/opt/airflow/.env
-    command: scheduler
-    depends_on:
-      - postgres
-
   postgres:
     image: postgres:13
     environment:
@@ -64,6 +12,72 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  airflow-webserver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - ${HOME}/.env
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__FERNET_KEY=''
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=True
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.basic_auth
+      - SNOWFLAKE_PRIVATE_KEY_PATH=/opt/airflow/snowflake_rsa_key.p8
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./pipelines:/opt/airflow/pipelines
+      - ./dbt:/opt/airflow/dbt
+      - ./data:/opt/airflow/data
+      - ./great_expectations:/opt/airflow/great_expectations
+      - ${HOME}/.env:/opt/airflow/.env
+      - /Users/jiufeng/Documents/project/snowflake-key/rsa_key.p8:/opt/airflow/snowflake_rsa_key.p8:ro
+      - ${HOME}/.kaggle:/root/.kaggle:ro
+    ports:
+      - "8080:8080"
+    command: ["airflow", "webserver"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  airflow-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - ${HOME}/.env
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__FERNET_KEY=''
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=True
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - SNOWFLAKE_PRIVATE_KEY_PATH=/opt/airflow/snowflake_rsa_key.p8
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./pipelines:/opt/airflow/pipelines
+      - ./dbt:/opt/airflow/dbt
+      - ./data:/opt/airflow/data
+      - ./great_expectations:/opt/airflow/great_expectations
+      - ${HOME}/.env:/opt/airflow/.env
+      - /Users/jiufeng/Documents/project/snowflake-key/rsa_key.p8:/opt/airflow/snowflake_rsa_key.p8:ro
+      - ${HOME}/.kaggle:/root/.kaggle:ro
+    command: ["airflow", "scheduler"]
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres-db-volume:

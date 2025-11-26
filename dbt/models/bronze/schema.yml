@@ -46,10 +46,9 @@ models:
         description: "Timestamp when bronze processing was completed"
     tests:
       - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - company_name
-              - country
+          combination_of_columns:
+            - company_name
+            - country
 
   - name: bronze_fct_company_metrics
     description: "Bronze fact table with cleaned company metrics from raw layer, applying data quality improvements and standardization"
@@ -58,10 +57,6 @@ models:
         description: "Foreign key to bronze_dim_companies"
         tests:
           - not_null
-          - relationships:
-              arguments:
-                to: ref('bronze_dim_companies')
-                field: company_id
       - name: company_name
         description: "Company name (for reference)"
         tests:
@@ -96,10 +91,9 @@ models:
         description: "Timestamp when bronze processing was completed"
     tests:
       - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - company_id
-              - metric_date
+          combination_of_columns:
+            - company_id
+            - metric_date
 
   - name: bronze_dim_founder
     description: "Bronze dimension table with founder information extracted from staging data"

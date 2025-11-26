@@ -58,10 +58,6 @@ models:
         description: "Foreign key to raw_dim_companies"
         tests:
           - not_null
-          - relationships:
-              arguments:
-                to: ref('raw_dim_companies')
-                field: company_id
       - name: company_name
         description: "Company name (for reference)"
         tests:

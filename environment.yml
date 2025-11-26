@@ -18,6 +18,7 @@ dependencies:
     # Snowflake
     - snowflake-connector-python>=3.7.1,<4.0.0
     - snowflake-sqlalchemy==1.5.0
+    - cryptography==41.0.7
     # dbt
     - dbt-core==1.7.7
     - dbt-snowflake==1.7.1
@@ -25,6 +26,9 @@ dependencies:
     - apache-airflow==2.8.1
     - apache-airflow-providers-amazon==8.13.0
     - apache-airflow-providers-snowflake==5.6.0
+    - apache-airflow-providers-postgres==5.8.0
+    - psycopg2-binary==2.9.9
+    - Flask-Session==0.5.0
     # Kaggle
     - kaggle==1.5.16
     # Data validation
@@ -46,7 +50,11 @@ dependencies:
     # Async web scraping (trio-based)
     - trio==0.23.2
     - trio-typing==0.9.0
-    - asks==3.2.0
+    - asks==3.0.0
     - beautifulsoup4==4.12.3
     - lxml==5.3.0
+    # Additional dependencies for Airflow/Docker
+    - protobuf>=4.21.0,<5.0.0
+    - opentelemetry-proto<1.28.0
+    - graphviz==0.20.1
 

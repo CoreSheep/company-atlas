@@ -227,7 +227,28 @@ FastAPI-based RESTful API with comprehensive endpoints:
     - Range validation: founded_year, fortune_rank, employee_count
     - Schema validation and data type enforcement
 
-**Data Lineage:**
+**Metadata & Catalog Management:**
+
+dbt serves as a centralized metadata management and data catalog platform, providing:
+
+- **Business Metadata**:
+  - Model descriptions and documentation
+  - Data owner and domain assignments
+  - PII (Personally Identifiable Information) flags for sensitive columns
+  - SLA (Service Level Agreement) definitions for data freshness
+  - Business glossary and terminology definitions
+
+- **Technical Metadata**:
+  - Schema definitions and column data types
+  - Source system tracking (`source_system` field)
+  - Transformation logic documentation
+  - Materialization strategies (table, view, incremental)
+
+- **Data Lineage**:
+  - End-to-end lineage from source to marts
+  - Column-level lineage tracking
+  - Impact analysis for downstream dependencies
+  - Visual DAG representation
 
 <div align="center">
 
@@ -236,6 +257,15 @@ FastAPI-based RESTful API with comprehensive endpoints:
 </div>
 
 The lineage graph above shows the complete data flow from staging tables through raw, bronze, and marts layers, demonstrating how data is transformed and validated at each stage.
+
+**Generate dbt Documentation:**
+
+```bash
+dbt docs generate # Generate the docs website
+dbt docs serve # Serve the docs website
+```
+
+The docs website will be available at `http://localhost:8000`.
 
 ### 4. Orchestration
 
@@ -577,7 +607,42 @@ dbt deps
 cd ..
 ```
 
-#### 5. Run pipeline steps manually:
+#### 5. Run dbt models using the helper script:
+
+The `dbt/run_dbt.sh` script automatically loads environment variables from `~/.env`:
+
+Note: Make sure you specify the correct Snowflake private key path in the `~/.env` file.
+```bash
+SNOWFLAKE_PRIVATE_KEY_PATH=/path/to/your/rsa_key.p8
+```
+
+```bash
+cd dbt
+
+# Run all models and tests
+bash run_dbt.sh build
+
+# Run specific layer
+bash run_dbt.sh run --select raw
+bash run_dbt.sh run --select bronze
+bash run_dbt.sh run --select marts
+
+# Run tests for specific layer
+bash run_dbt.sh test --select raw
+bash run_dbt.sh test --select bronze
+bash run_dbt.sh test --select marts
+
+# Run all tests
+bash run_dbt.sh test
+
+# Run both models and tests
+bash run_dbt.sh build
+
+# Debug mode
+bash run_dbt.sh debug
+```
+
+#### 7. Run pipeline steps manually (alternative):
 
 ```bash
 # Step 1: Download datasets from Kaggle
@@ -591,26 +656,26 @@ python pipelines/staging/run_load_script.py
 
 # Step 4-5: Run dbt raw layer and tests
 cd dbt
-dbt run --select raw.*
-dbt test --select raw.*
+bash run_dbt.sh run --select raw
+bash run_dbt.sh test --select raw
 
 # Step 6-7: Run dbt bronze layer and tests
-dbt run --select bronze.*
-dbt test --select bronze.*
+bash run_dbt.sh run --select bronze
+bash run_dbt.sh test --select bronze
 
 # Step 8-9: Run dbt marts layer and tests
-dbt run --select marts.*
-dbt test --select marts.*
+bash run_dbt.sh run --select marts
+bash run_dbt.sh test --select marts
 
 # Step 10: Run all dbt tests
-dbt test
+bash run_dbt.sh test
 cd ..
 
 # Optional: Run Great Expectations validation
 python -c "from pipelines.validation.great_expectations_setup import GreatExpectationsValidator; v = GreatExpectationsValidator(); v.validate_all_layers()"
 ```
 
-#### 6. Start the API server (optional):
+#### 8. Start the API server (optional):
 ```bash
 cd api
 uvicorn main:app --reload --port 8000

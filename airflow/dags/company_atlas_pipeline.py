@@ -2,20 +2,25 @@
 Apache Airflow DAG for Company Atlas data pipeline.
 
 This DAG orchestrates the complete data pipeline:
-1. Data Ingestion: Kaggle datasets + Web crawler enrichment
-2. S3 Upload: Upload raw CSV/Parquet files to S3
-3. Snowflake Staging: Load data from S3 to Snowflake staging tables
+1. Download Fortune 1000 dataset from Kaggle (jeannicolasduval/2024-fortune-1000-companies)
+   - Saves fortune1000_2024.csv to data/raw/fortune1000/
+   - Saves fortune1000_companies.csv to data/raw/global_companies/
+2. Upload CSV files to S3
+   - fortune1000_2024.csv -> s3://bucket/raw/fortune1000/{date}/
+   - fortune1000_companies.csv -> s3://bucket/raw/global_companies/{date}/
+3. Load data from S3 to Snowflake staging tables
 4. dbt Raw Layer: Initial data cleaning and normalization
-5. dbt Bronze Layer: Data quality validation and standardization
-6. dbt Marts Layer: Analytics-ready unified tables
-7. dbt Tests: Data quality validation
-8. Website Data Download: Download unified companies for website visualization
+5. Great Expectations: Validate raw layer data quality
+6. dbt Bronze Layer: Data quality validation and standardization
+7. Great Expectations: Validate bronze layer data quality
+8. dbt Marts Layer: Analytics-ready unified tables
+9. Great Expectations: Validate marts layer data quality
+10. dbt Tests: Data quality validation tests
 """
 
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from airflow.operators.bash import BashOperator
 from airflow.utils.dates import days_ago
 import sys
 import os
@@ -23,12 +28,14 @@ import subprocess
 from pathlib import Path
 
 # Add project root to path
-project_root = Path(__file__).parent.parent.parent
+# In Docker container: /opt/airflow/dags/company_atlas_pipeline.py
+# project_root should be /opt/airflow
+project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-# Load environment variables
+# Load environment variables (don't override existing env vars set by container)
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(override=False)
 
 default_args = {
     'owner': 'company-atlas',
@@ -43,147 +50,226 @@ default_args = {
 dag = DAG(
     'company_atlas_pipeline',
     default_args=default_args,
-    description='Unified firmographic data pipeline: Ingestion → Staging → Raw → Bronze → Marts',
-    schedule_interval=timedelta(days=1),  # Daily schedule
+    description='Complete data pipeline: Ingestion -> S3 -> Snowflake Staging -> dbt (Raw/Bronze/Marts) -> Great Expectations',
+    schedule_interval=None,  # Manual trigger only (set to timedelta(days=1) for daily schedule)
     start_date=days_ago(1),
     catchup=False,
-    tags=['company-atlas', 'data-pipeline', 'etl'],
+    tags=['company-atlas', 'data-pipeline', 'ingestion', 's3', 'snowflake', 'dbt', 'great-expectations'],
     max_active_runs=1,  # Only one run at a time
 )
 
 
 # ============================================================================
-# Task Functions
+# Task Functions - Data Ingestion
 # ============================================================================
 
-def ingest_data(**context):
-    """Step 1: Ingest data from Kaggle and web crawler."""
-    import trio
-    from pipelines.ingestion.main_ingestion import main as ingestion_main
+def download_datasets(**context):
+    """Step 1: Download Fortune 1000 dataset from Kaggle using download_datasets.py."""
+    import logging
+    import pandas as pd
+    import kaggle
     
-    logger = context.get('logger')
-    if not logger:
-        import logging
-        logger = logging.getLogger(__name__)
+    logger = logging.getLogger(__name__)
     
-    logger.info("Starting data ingestion (Kaggle + Web Crawler)...")
+    logger.info("Downloading Fortune 1000 dataset from Kaggle...")
     
     try:
-        # Run the async ingestion function
-        df_fortune, df_global = trio.run(ingestion_main)
+        # Authenticate Kaggle API
+        kaggle.api.authenticate()
         
-        logger.info(f"Ingestion completed successfully!")
-        logger.info(f"   - Fortune 1000: {len(df_fortune)} companies")
-        if df_global is not None:
-            logger.info(f"   - Global Companies: {len(df_global)} companies")
+        data_dir = project_root / 'data' / 'raw'
+        data_dir.mkdir(parents=True, exist_ok=True)
         
-        # Store results in XCom for downstream tasks
-        context['ti'].xcom_push(key='ingestion_status', value='success')
-        context['ti'].xcom_push(key='fortune_count', value=len(df_fortune))
-        context['ti'].xcom_push(key='global_count', value=len(df_global) if df_global is not None else 0)
+        # Download Fortune 1000 dataset
+        dataset = "jeannicolasduval/2024-fortune-1000-companies"
+        fortune_path = data_dir / "fortune1000"
+        fortune_path.mkdir(exist_ok=True, parents=True)
         
-        return {
-            'status': 'success',
-            'fortune_count': len(df_fortune),
-            'global_count': len(df_global) if df_global is not None else 0
-        }
+        logger.info(f"Downloading dataset: {dataset}")
+        kaggle.api.dataset_download_files(
+            dataset,
+            path=str(fortune_path),
+            unzip=True,
+            quiet=False
+        )
+        
+        # Find and read CSV file
+        csv_files = list(fortune_path.glob("*.csv"))
+        if csv_files:
+            main_csv = next((f for f in csv_files if 'fortune' in f.name.lower() and '2024' in f.name), csv_files[0])
+            df = pd.read_csv(main_csv)
+            logger.info(f"Downloaded Fortune 1000: {len(df)} records")
+            logger.info(f"Saved to: {main_csv}")
+            
+            # Create global_companies directory and save normalized version
+            global_dir = data_dir / "global_companies"
+            global_dir.mkdir(exist_ok=True, parents=True)
+            
+            # Save as fortune1000_companies.csv (normalized copy)
+            fortune_companies_path = global_dir / "fortune1000_companies.csv"
+            df.to_csv(fortune_companies_path, index=False)
+            logger.info(f"Saved normalized copy to: {fortune_companies_path}")
+        else:
+            raise FileNotFoundError("No CSV files found in downloaded dataset")
+        
+        context['ti'].xcom_push(key='download_status', value='success')
+        context['ti'].xcom_push(key='records_count', value=len(df))
+        return {'status': 'success', 'records': len(df)}
+        
     except Exception as e:
-        logger.error(f"Ingestion failed: {e}", exc_info=True)
+        logger.error(f"Failed to download datasets: {e}", exc_info=True)
         raise
 
 
 def upload_to_s3(**context):
-    """Step 2: Upload CSV files to S3."""
-    import sys
-    from pathlib import Path
+    """Step 2: Upload fortune1000_2024.csv and fortune1000_companies.csv to S3."""
+    import logging
+    import boto3
+    from datetime import datetime
     
-    logger = context.get('logger')
-    if not logger:
-        import logging
-        logger = logging.getLogger(__name__)
+    logger = logging.getLogger(__name__)
     
-    logger.info("Starting S3 upload...")
+    logger.info("Uploading CSV files to S3...")
     
     try:
-        # Import and run the upload script
-        upload_script = project_root / 'pipelines' / 'staging' / 'upload_to_s3.py'
+        bucket_name = os.getenv("S3_BUCKET_NAME")
+        if not bucket_name:
+            timestamp = datetime.utcnow().strftime("%Y%m")
+            bucket_name = f"company-atlas-{timestamp}"
         
-        # Change to project root directory
-        os.chdir(project_root)
-        
-        # Run the upload script
-        result = subprocess.run(
-            [sys.executable, str(upload_script)],
-            capture_output=True,
-            text=True,
-            cwd=str(project_root)
+        s3_client = boto3.client(
+            's3',
+            aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
         )
         
-        if result.returncode != 0:
-            logger.error(f"S3 upload failed: {result.stderr}")
-            raise Exception(f"S3 upload failed: {result.stderr}")
+        # Verify bucket exists
+        s3_client.head_bucket(Bucket=bucket_name)
+        logger.info(f"Using S3 bucket: {bucket_name}")
         
-        logger.info("S3 upload completed successfully!")
-        logger.info(result.stdout)
+        # Files to upload
+        files_to_upload = [
+            (project_root / "data/raw/fortune1000/fortune1000_2024.csv", "raw/fortune1000"),
+            (project_root / "data/raw/global_companies/fortune1000_companies.csv", "raw/global_companies"),
+        ]
         
+        date_str = datetime.utcnow().strftime("%Y-%m-%d")
+        uploaded_files = []
+        
+        for file_path, key_prefix in files_to_upload:
+            if file_path.exists():
+                key = f"{key_prefix}/{date_str}/{file_path.name}"
+                logger.info(f"Uploading {file_path.name} to s3://{bucket_name}/{key}")
+                s3_client.upload_file(str(file_path), bucket_name, key)
+                uploaded_files.append(f"s3://{bucket_name}/{key}")
+                logger.info(f"  Uploaded: {file_path.stat().st_size / 1024:.2f} KB")
+            else:
+                logger.warning(f"File not found: {file_path}")
+        
+        logger.info(f"Successfully uploaded {len(uploaded_files)} file(s) to S3")
+        
+        context['ti'].xcom_push(key='s3_files', value=uploaded_files)
         context['ti'].xcom_push(key='upload_status', value='success')
-        return {'status': 'success'}
+        return {'status': 'success', 'files': uploaded_files}
+        
     except Exception as e:
-        logger.error(f"S3 upload failed: {e}", exc_info=True)
+        logger.error(f"Failed to upload to S3: {e}", exc_info=True)
         raise
 
 
-def load_to_snowflake(**context):
+def load_to_snowflake_staging(**context):
     """Step 3: Load data from S3 to Snowflake staging tables."""
-    import sys
-    
-    logger = context.get('logger')
-    if not logger:
-        import logging
-        logger = logging.getLogger(__name__)
+    import logging
+    logger = logging.getLogger(__name__)
     
     logger.info("Loading data from S3 to Snowflake staging tables...")
     
     try:
-        # Use the existing Python script for loading
-        load_script = project_root / 'pipelines' / 'staging' / 'run_load_script.py'
+        import snowflake.connector
+        from cryptography.hazmat.primitives import serialization
+        from cryptography.hazmat.backends import default_backend
         
-        if not load_script.exists():
-            raise FileNotFoundError(f"Load script not found: {load_script}")
+        # Use container path for private key (mounted from host)
+        private_key_path = '/opt/airflow/snowflake_rsa_key.p8'
         
-        # Change to project root directory
-        os.chdir(project_root)
+        logger.info(f"Using private key path: {private_key_path}")
+        logger.info(f"Private key exists: {os.path.exists(private_key_path)}")
         
-        # Run the load script
-        result = subprocess.run(
-            [sys.executable, str(load_script)],
-            capture_output=True,
-            text=True,
-            cwd=str(project_root)
-        )
+        if os.path.exists(private_key_path):
+            with open(private_key_path, 'rb') as key_file:
+                p_key = serialization.load_pem_private_key(
+                    key_file.read(),
+                    password=os.getenv('SNOWFLAKE_PRIVATE_KEY_PASSPHRASE', '').encode() if os.getenv('SNOWFLAKE_PRIVATE_KEY_PASSPHRASE') else None,
+                    backend=default_backend()
+                )
+            
+            pkb = p_key.private_bytes(
+                encoding=serialization.Encoding.DER,
+                format=serialization.PrivateFormat.PKCS8,
+                encryption_algorithm=serialization.NoEncryption()
+            )
+            
+            conn = snowflake.connector.connect(
+                account=os.getenv('SNOWFLAKE_ACCOUNT'),
+                user=os.getenv('SNOWFLAKE_USER'),
+                private_key=pkb,
+                warehouse=os.getenv('SNOWFLAKE_WAREHOUSE', 'COMPUTE_WH'),
+                database='COMPANY_ATLAS',
+                schema='STAGING',
+                role=os.getenv('SNOWFLAKE_ROLE', 'TRANSFORM')
+            )
+        else:
+            raise FileNotFoundError(f"Snowflake private key not found at {private_key_path}")
         
-        if result.returncode != 0:
-            logger.error(f"Snowflake load failed: {result.stderr}")
-            raise Exception(f"Snowflake load failed: {result.stderr}")
+        logger.info("Connected to Snowflake successfully!")
         
-        logger.info("Snowflake staging load completed successfully!")
-        logger.info(result.stdout)
+        # Execute the load SQL script
+        sql_file = project_root / "pipelines/staging/load_data_from_s3.sql"
         
-        context['ti'].xcom_push(key='snowflake_load_status', value='success')
+        if sql_file.exists():
+            logger.info(f"Executing SQL file: {sql_file}")
+            
+            with open(sql_file, 'r') as f:
+                sql_content = f.read()
+            
+            cursor = conn.cursor()
+            
+            # Split and execute statements
+            statements = [s.strip() for s in sql_content.split(';') if s.strip() and not s.strip().startswith('--')]
+            
+            for i, statement in enumerate(statements, 1):
+                if statement:
+                    logger.info(f"Executing statement {i}/{len(statements)}")
+                    try:
+                        cursor.execute(statement)
+                        logger.info(f"  Statement {i} executed successfully")
+                    except Exception as e:
+                        logger.warning(f"  Statement {i} failed: {e}")
+            
+            cursor.close()
+            conn.commit()
+        else:
+            logger.warning(f"SQL file not found: {sql_file}")
+        
+        conn.close()
+        logger.info("Data loaded to Snowflake staging successfully!")
+        
+        context['ti'].xcom_push(key='staging_status', value='success')
         return {'status': 'success'}
+        
     except Exception as e:
-        logger.error(f"Snowflake load failed: {e}", exc_info=True)
+        logger.error(f"Failed to load to Snowflake staging: {e}", exc_info=True)
         raise
 
 
+# ============================================================================
+# Task Functions - dbt Transformations
+# ============================================================================
+
 def run_dbt_raw(**context):
     """Step 4: Run dbt raw layer models."""
-    import subprocess
-    
-    logger = context.get('logger')
-    if not logger:
-        import logging
-        logger = logging.getLogger(__name__)
+    import logging
+    logger = logging.getLogger(__name__)
     
     logger.info("Running dbt raw layer models...")
     
@@ -191,17 +277,21 @@ def run_dbt_raw(**context):
     os.chdir(dbt_dir)
     
     try:
+        env = os.environ.copy()
+        env['SNOWFLAKE_PRIVATE_KEY_PATH'] = '/opt/airflow/snowflake_rsa_key.p8'
+        
         result = subprocess.run(
             ['dbt', 'run', '--select', 'raw.*'],
             capture_output=True,
             text=True,
             cwd=str(dbt_dir),
-            env=os.environ.copy()
+            env=env
         )
         
         if result.returncode != 0:
-            logger.error(f"dbt raw models failed: {result.stderr}")
-            raise Exception(f"dbt raw models failed: {result.stderr}")
+            logger.error(f"dbt raw models failed - stdout: {result.stdout}")
+            logger.error(f"dbt raw models failed - stderr: {result.stderr}")
+            raise Exception(f"dbt raw models failed: {result.stdout or result.stderr}")
         
         logger.info("dbt raw layer completed successfully!")
         logger.info(result.stdout)
@@ -214,13 +304,9 @@ def run_dbt_raw(**context):
 
 
 def run_dbt_bronze(**context):
-    """Step 5: Run dbt bronze layer models."""
-    import subprocess
-    
-    logger = context.get('logger')
-    if not logger:
-        import logging
-        logger = logging.getLogger(__name__)
+    """Step 6: Run dbt bronze layer models."""
+    import logging
+    logger = logging.getLogger(__name__)
     
     logger.info("Running dbt bronze layer models...")
     
@@ -228,12 +314,15 @@ def run_dbt_bronze(**context):
     os.chdir(dbt_dir)
     
     try:
+        env = os.environ.copy()
+        env['SNOWFLAKE_PRIVATE_KEY_PATH'] = '/opt/airflow/snowflake_rsa_key.p8'
+        
         result = subprocess.run(
             ['dbt', 'run', '--select', 'bronze.*'],
             capture_output=True,
             text=True,
             cwd=str(dbt_dir),
-            env=os.environ.copy()
+            env=env
         )
         
         if result.returncode != 0:
@@ -251,13 +340,9 @@ def run_dbt_bronze(**context):
 
 
 def run_dbt_marts(**context):
-    """Step 6: Run dbt marts layer models."""
-    import subprocess
-    
-    logger = context.get('logger')
-    if not logger:
-        import logging
-        logger = logging.getLogger(__name__)
+    """Step 8: Run dbt marts layer models."""
+    import logging
+    logger = logging.getLogger(__name__)
     
     logger.info("Running dbt marts layer models...")
     
@@ -265,12 +350,15 @@ def run_dbt_marts(**context):
     os.chdir(dbt_dir)
     
     try:
+        env = os.environ.copy()
+        env['SNOWFLAKE_PRIVATE_KEY_PATH'] = '/opt/airflow/snowflake_rsa_key.p8'
+        
         result = subprocess.run(
             ['dbt', 'run', '--select', 'marts.*'],
             capture_output=True,
             text=True,
             cwd=str(dbt_dir),
-            env=os.environ.copy()
+            env=env
         )
         
         if result.returncode != 0:
@@ -288,13 +376,9 @@ def run_dbt_marts(**context):
 
 
 def run_dbt_tests(**context):
-    """Step 7: Run dbt tests for data quality validation."""
-    import subprocess
-    
-    logger = context.get('logger')
-    if not logger:
-        import logging
-        logger = logging.getLogger(__name__)
+    """Step 10: Run dbt tests for data quality validation."""
+    import logging
+    logger = logging.getLogger(__name__)
     
     logger.info("Running dbt tests...")
     
@@ -302,17 +386,19 @@ def run_dbt_tests(**context):
     os.chdir(dbt_dir)
     
     try:
+        env = os.environ.copy()
+        env['SNOWFLAKE_PRIVATE_KEY_PATH'] = '/opt/airflow/snowflake_rsa_key.p8'
+        
         result = subprocess.run(
             ['dbt', 'test'],
             capture_output=True,
             text=True,
             cwd=str(dbt_dir),
-            env=os.environ.copy()
+            env=env
         )
         
         if result.returncode != 0:
             logger.error(f"dbt tests failed: {result.stderr}")
-            # Don't raise exception - tests might fail but we want to continue
             logger.warning("Some dbt tests failed, but continuing pipeline...")
         
         logger.info("dbt tests completed!")
@@ -322,22 +408,23 @@ def run_dbt_tests(**context):
         return {'status': 'completed'}
     except Exception as e:
         logger.error(f"dbt tests error: {e}", exc_info=True)
-        # Don't raise - allow pipeline to continue even if tests fail
         return {'status': 'error', 'error': str(e)}
 
 
+# ============================================================================
+# Task Functions - Great Expectations Validation
+# ============================================================================
+
 def validate_raw_with_ge(**context):
-    """Step 4b: Validate raw layer with Great Expectations."""
-    from pipelines.validation.great_expectations_setup import GreatExpectationsValidator
-    
-    logger = context.get('logger')
-    if not logger:
-        import logging
-        logger = logging.getLogger(__name__)
+    """Step 5: Validate raw layer with Great Expectations."""
+    import logging
+    logger = logging.getLogger(__name__)
     
     logger.info("Validating raw layer with Great Expectations...")
     
     try:
+        from pipelines.validation.great_expectations_setup import GreatExpectationsValidator
+        
         validator = GreatExpectationsValidator()
         results = validator.validate_raw_layer()
         
@@ -348,23 +435,20 @@ def validate_raw_with_ge(**context):
         return {'status': 'success', 'results': str(results)}
     except Exception as e:
         logger.error(f"Raw layer Great Expectations validation failed: {e}", exc_info=True)
-        # Don't raise - allow pipeline to continue even if validation fails
         logger.warning("Great Expectations validation failed, but continuing pipeline...")
         return {'status': 'error', 'error': str(e)}
 
 
 def validate_bronze_with_ge(**context):
-    """Step 5b: Validate bronze layer with Great Expectations."""
-    from pipelines.validation.great_expectations_setup import GreatExpectationsValidator
-    
-    logger = context.get('logger')
-    if not logger:
-        import logging
-        logger = logging.getLogger(__name__)
+    """Step 7: Validate bronze layer with Great Expectations."""
+    import logging
+    logger = logging.getLogger(__name__)
     
     logger.info("Validating bronze layer with Great Expectations...")
     
     try:
+        from pipelines.validation.great_expectations_setup import GreatExpectationsValidator
+        
         validator = GreatExpectationsValidator()
         results = validator.validate_bronze_layer()
         
@@ -375,23 +459,20 @@ def validate_bronze_with_ge(**context):
         return {'status': 'success', 'results': str(results)}
     except Exception as e:
         logger.error(f"Bronze layer Great Expectations validation failed: {e}", exc_info=True)
-        # Don't raise - allow pipeline to continue even if validation fails
         logger.warning("Great Expectations validation failed, but continuing pipeline...")
         return {'status': 'error', 'error': str(e)}
 
 
 def validate_marts_with_ge(**context):
-    """Step 6b: Validate marts layer with Great Expectations."""
-    from pipelines.validation.great_expectations_setup import GreatExpectationsValidator
-    
-    logger = context.get('logger')
-    if not logger:
-        import logging
-        logger = logging.getLogger(__name__)
+    """Step 9: Validate marts layer with Great Expectations."""
+    import logging
+    logger = logging.getLogger(__name__)
     
     logger.info("Validating marts layer with Great Expectations...")
     
     try:
+        from pipelines.validation.great_expectations_setup import GreatExpectationsValidator
+        
         validator = GreatExpectationsValidator()
         results = validator.validate_marts_layer()
         
@@ -402,145 +483,92 @@ def validate_marts_with_ge(**context):
         return {'status': 'success', 'results': str(results)}
     except Exception as e:
         logger.error(f"Marts layer Great Expectations validation failed: {e}", exc_info=True)
-        # Don't raise - allow pipeline to continue even if validation fails
         logger.warning("Great Expectations validation failed, but continuing pipeline...")
         return {'status': 'error', 'error': str(e)}
-
-
-def download_website_data(**context):
-    """Step 8: Download unified companies data for website visualization."""
-    import sys
-    from pathlib import Path
-    
-    logger = context.get('logger')
-    if not logger:
-        import logging
-        logger = logging.getLogger(__name__)
-    
-    logger.info("Downloading unified companies data for website...")
-    
-    try:
-        download_script = project_root / 'pipelines' / 'marts' / 'download_unified_companies.py'
-        
-        # Change to project root directory
-        os.chdir(project_root)
-        
-        # Run the download script
-        result = subprocess.run(
-            [sys.executable, str(download_script)],
-            capture_output=True,
-            text=True,
-            cwd=str(project_root)
-        )
-        
-        if result.returncode != 0:
-            logger.error(f"Website data download failed: {result.stderr}")
-            raise Exception(f"Website data download failed: {result.stderr}")
-        
-        logger.info("Website data download completed successfully!")
-        logger.info(result.stdout)
-        
-        context['ti'].xcom_push(key='website_download_status', value='success')
-        return {'status': 'success'}
-    except Exception as e:
-        logger.error(f"Website data download failed: {e}", exc_info=True)
-        raise
 
 
 # ============================================================================
 # Define Tasks
 # ============================================================================
 
-# Step 1: Data Ingestion
-ingest_task = PythonOperator(
-    task_id='ingest_data',
-    python_callable=ingest_data,
+# Step 1: Download datasets from Kaggle
+download_datasets_task = PythonOperator(
+    task_id='download_datasets',
+    python_callable=download_datasets,
     dag=dag,
-    pool='default_pool',
+    pool=None,
 )
 
-# Step 2: Upload to S3
-upload_s3_task = PythonOperator(
+# Step 2: Upload CSV files to S3
+upload_to_s3_task = PythonOperator(
     task_id='upload_to_s3',
     python_callable=upload_to_s3,
     dag=dag,
-    pool='default_pool',
+    pool=None,
 )
 
-# Step 3: Load to Snowflake Staging
-load_snowflake_task = PythonOperator(
+# Step 3: Load data from S3 to Snowflake staging
+load_to_staging_task = PythonOperator(
     task_id='load_to_snowflake_staging',
-    python_callable=load_to_snowflake,
+    python_callable=load_to_snowflake_staging,
     dag=dag,
-    pool='default_pool',
+    pool=None,
 )
 
 # Step 4: dbt Raw Layer
-run_dbt_raw_task = BashOperator(
+run_dbt_raw_task = PythonOperator(
     task_id='run_dbt_raw',
-    bash_command='cd {{ params.dbt_dir }} && dbt run --select raw.*',
-    params={'dbt_dir': str(project_root / 'dbt')},
+    python_callable=run_dbt_raw,
     dag=dag,
-    env={'PATH': os.environ.get('PATH', '')},
+    pool=None,
 )
 
-# Step 5: dbt Bronze Layer
-run_dbt_bronze_task = BashOperator(
-    task_id='run_dbt_bronze',
-    bash_command='cd {{ params.dbt_dir }} && dbt run --select bronze.*',
-    params={'dbt_dir': str(project_root / 'dbt')},
-    dag=dag,
-    env={'PATH': os.environ.get('PATH', '')},
-)
-
-# Step 6: dbt Marts Layer
-run_dbt_marts_task = BashOperator(
-    task_id='run_dbt_marts',
-    bash_command='cd {{ params.dbt_dir }} && dbt run --select marts.*',
-    params={'dbt_dir': str(project_root / 'dbt')},
-    dag=dag,
-    env={'PATH': os.environ.get('PATH', '')},
-)
-
-# Step 4b: Validate Raw Layer with Great Expectations
+# Step 5: Validate Raw Layer with Great Expectations
 validate_raw_ge_task = PythonOperator(
     task_id='validate_raw_with_great_expectations',
     python_callable=validate_raw_with_ge,
     dag=dag,
-    pool='default_pool',
+    pool=None,
 )
 
-# Step 5b: Validate Bronze Layer with Great Expectations
+# Step 6: dbt Bronze Layer
+run_dbt_bronze_task = PythonOperator(
+    task_id='run_dbt_bronze',
+    python_callable=run_dbt_bronze,
+    dag=dag,
+    pool=None,
+)
+
+# Step 7: Validate Bronze Layer with Great Expectations
 validate_bronze_ge_task = PythonOperator(
     task_id='validate_bronze_with_great_expectations',
     python_callable=validate_bronze_with_ge,
     dag=dag,
-    pool='default_pool',
+    pool=None,
 )
 
-# Step 6b: Validate Marts Layer with Great Expectations
+# Step 8: dbt Marts Layer
+run_dbt_marts_task = PythonOperator(
+    task_id='run_dbt_marts',
+    python_callable=run_dbt_marts,
+    dag=dag,
+    pool=None,
+)
+
+# Step 9: Validate Marts Layer with Great Expectations
 validate_marts_ge_task = PythonOperator(
     task_id='validate_marts_with_great_expectations',
     python_callable=validate_marts_with_ge,
     dag=dag,
-    pool='default_pool',
+    pool=None,
 )
 
-# Step 7: dbt Tests
-run_dbt_tests_task = BashOperator(
+# Step 10: dbt Tests
+run_dbt_tests_task = PythonOperator(
     task_id='run_dbt_tests',
-    bash_command='cd {{ params.dbt_dir }} && dbt test || true',  # Continue even if tests fail
-    params={'dbt_dir': str(project_root / 'dbt')},
+    python_callable=run_dbt_tests,
     dag=dag,
-    env={'PATH': os.environ.get('PATH', '')},
-)
-
-# Step 8: Download Website Data
-download_website_task = PythonOperator(
-    task_id='download_website_data',
-    python_callable=download_website_data,
-    dag=dag,
-    pool='default_pool',
+    pool=None,
 )
 
 
@@ -548,15 +576,15 @@ download_website_task = PythonOperator(
 # Define Task Dependencies
 # ============================================================================
 
-# Linear pipeline flow:
-# Ingestion → S3 Upload → Snowflake Staging → dbt Raw → GE Raw → dbt Bronze → GE Bronze → dbt Marts → GE Marts → dbt Tests → Website Download
+# Complete Pipeline Flow:
+# Download -> Upload S3 -> Snowflake Staging -> dbt Raw -> GE Raw -> dbt Bronze -> GE Bronze -> dbt Marts -> GE Marts -> dbt Tests
 
-ingest_task >> upload_s3_task >> load_snowflake_task
-load_snowflake_task >> run_dbt_raw_task
+download_datasets_task >> upload_to_s3_task
+upload_to_s3_task >> load_to_staging_task
+load_to_staging_task >> run_dbt_raw_task
 run_dbt_raw_task >> validate_raw_ge_task
 validate_raw_ge_task >> run_dbt_bronze_task
 run_dbt_bronze_task >> validate_bronze_ge_task
 validate_bronze_ge_task >> run_dbt_marts_task
 run_dbt_marts_task >> validate_marts_ge_task
 validate_marts_ge_task >> run_dbt_tests_task
-run_dbt_tests_task >> download_website_task

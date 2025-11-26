@@ -240,26 +240,38 @@ The lineage graph above shows the complete data flow from staging tables through
 ### 4. Orchestration
 
 **Apache Airflow:**
-- Automated workflow scheduling for the entire pipeline (daily schedule)
-- DAG: `company_atlas_pipeline` orchestrates the complete data flow
 
-**Pipeline Workflow:**
-1. **Data Ingestion**: Kaggle datasets + Web crawler enrichment
-2. **S3 Upload**: Upload raw CSV files to AWS S3
-3. **Snowflake Staging**: Load data from S3 to Snowflake staging tables (`STG_FORTUNE1000`, `STG_GLOBAL_COMPANIES`)
-4. **dbt Raw Layer**: Run raw layer models for initial data cleaning and normalization
-5. **Great Expectations Raw Validation**: Validate raw layer data quality
-6. **dbt Bronze Layer**: Run bronze layer models for data quality validation and standardization
-7. **Great Expectations Bronze Validation**: Validate bronze layer data quality
-8. **dbt Marts Layer**: Run marts layer models to create analytics-ready unified tables
-9. **Great Expectations Marts Validation**: Validate marts layer data quality
-10. **dbt Tests**: Run comprehensive data quality tests
-11. **Website Data Download**: Download unified companies data for website visualization
+<div align="center">
+
+<img src="images/airflow_orchestration.png" alt="Airflow DAG Orchestration">
+
+</div>
+
+- DAG: `company_atlas_pipeline` orchestrates the complete data flow
+- Schedule: Manual trigger (configurable to daily with `schedule_interval=timedelta(days=1)`)
+- Max active runs: 1 (prevents concurrent executions)
+- Retries: 2 attempts with 5-minute delay
+
+**Pipeline Tasks (10 steps):**
+
+| Step | Task ID | Description |
+|------|---------|-------------|
+| 1 | `download_datasets` | Download Fortune 1000 from Kaggle (`jeannicolasduval/2024-fortune-1000-companies`) |
+| 2 | `upload_to_s3` | Upload `fortune1000_2024.csv` and `fortune1000_companies.csv` to S3 |
+| 3 | `load_to_snowflake_staging` | Load data from S3 to Snowflake staging tables |
+| 4 | `run_dbt_raw` | Run dbt raw layer models for initial data cleaning |
+| 5 | `validate_raw_with_great_expectations` | Validate raw layer data quality |
+| 6 | `run_dbt_bronze` | Run dbt bronze layer models for standardization |
+| 7 | `validate_bronze_with_great_expectations` | Validate bronze layer data quality |
+| 8 | `run_dbt_marts` | Run dbt marts layer models for analytics-ready tables |
+| 9 | `validate_marts_with_great_expectations` | Validate marts layer data quality |
+| 10 | `run_dbt_tests` | Run comprehensive dbt data quality tests |
 
 **Task Dependencies:**
 ```
-Ingestion → S3 Upload → Snowflake Staging → dbt Raw → GE Raw → 
-dbt Bronze → GE Bronze → dbt Marts → GE Marts → dbt Tests → Website Download
+download_datasets → upload_to_s3 → load_to_snowflake_staging → run_dbt_raw → 
+validate_raw_with_great_expectations → run_dbt_bronze → validate_bronze_with_great_expectations → 
+run_dbt_marts → validate_marts_with_great_expectations → run_dbt_tests
 ```
 
 ### 5. Data Transformation
@@ -396,73 +408,214 @@ company-atlas/
 ### Prerequisites
 
 - Python 3.9+
-- Snowflake account
+- Docker and Docker Compose
+- Snowflake account with key-pair authentication
 - AWS account with S3 access
 - Kaggle API credentials
 
-### Installation
+### Required Credentials & Configuration Files
 
-1. Clone the repository:
+Before setting up the project, ensure you have the following credentials configured:
+
+#### 1. Snowflake Private Key (MFA Authentication)
+
+Snowflake requires key-pair authentication for accounts with MFA enabled. Generate and configure your private key:
+
+```bash
+# Generate RSA key pair (if not already done)
+openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -out rsa_key.p8 -nocrypt
+
+# Extract public key for Snowflake
+openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub
+
+# Add public key to your Snowflake user
+# In Snowflake: ALTER USER <username> SET RSA_PUBLIC_KEY='<public_key_content>';
+```
+
+Store your private key in a secure location (e.g., `~/Documents/project/snowflake-key/rsa_key.p8`).
+
+#### 2. Environment Variables (.env file)
+
+Create a `.env` file in your home directory (`~/.env`) with the following variables:
+
+```bash
+# Snowflake Configuration
+SNOWFLAKE_ACCOUNT=your_account_identifier
+SNOWFLAKE_USER=your_username
+SNOWFLAKE_ROLE=TRANSFORM
+SNOWFLAKE_WAREHOUSE=COMPUTE_WH
+SNOWFLAKE_DATABASE=COMPANY_ATLAS
+SNOWFLAKE_SCHEMA=RAW
+SNOWFLAKE_PRIVATE_KEY_PATH=/path/to/your/rsa_key.p8
+
+# AWS S3 Configuration
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+S3_BUCKET_NAME=company-atlas-YYYYMM
+
+# Kaggle API (optional if using ~/.kaggle/kaggle.json)
+KAGGLE_USERNAME=your_kaggle_username
+KAGGLE_KEY=your_kaggle_api_key
+```
+
+#### 3. Kaggle API Credentials
+
+Download your Kaggle API token from [Kaggle Account Settings](https://www.kaggle.com/settings) and place it at:
+
+```bash
+~/.kaggle/kaggle.json
+```
+
+Ensure proper permissions:
+```bash
+chmod 600 ~/.kaggle/kaggle.json
+```
+
+#### 4. AWS S3 Bucket
+
+Create an S3 bucket for storing raw data files:
+```bash
+aws s3 mb s3://company-atlas-YYYYMM
+```
+
+---
+
+### Option A: Docker + Airflow Setup (Recommended)
+
+This is the recommended approach for running the complete data pipeline with orchestration.
+
+#### 1. Clone the repository:
 ```bash
 git clone https://github.com/CoreSheep/company-atlas.git
 cd company-atlas
 ```
 
-2. Install Python dependencies:
+#### 2. Configure Docker volume mounts
+
+The `docker-compose.yml` mounts the following paths (update if your paths differ):
+
+| Host Path | Container Path | Purpose |
+|-----------|----------------|---------|
+| `~/.env` | `/opt/airflow/.env` | Environment variables |
+| `~/.kaggle` | `/root/.kaggle` | Kaggle API credentials |
+| `/path/to/rsa_key.p8` | `/opt/airflow/snowflake_rsa_key.p8` | Snowflake private key |
+
+> **Note**: Update the Snowflake private key path in `docker-compose.yml` to match your local path.
+
+#### 3. Build and start Docker containers:
+```bash
+# Build Docker images
+docker-compose build
+
+# Start all services (PostgreSQL, Airflow Webserver, Airflow Scheduler)
+docker-compose up -d
+
+# Check container status
+docker-compose ps
+```
+
+#### 4. Access Airflow Web UI:
+- **URL**: http://localhost:8080
+- **Username**: `airflow_company_atlas`
+- **Password**: `CompanyAtlas123!`
+
+#### 5. Run the data pipeline:
+- Unpause the `company_atlas_pipeline` DAG in the Airflow UI
+- Click "Trigger DAG" to run the complete pipeline
+- Monitor task progress in the Graph or Tree view
+
+**Pipeline Tasks (10 steps):**
+1. `download_datasets` - Download Fortune 1000 from Kaggle
+2. `upload_to_s3` - Upload CSV files to S3
+3. `load_to_snowflake_staging` - Load data to Snowflake staging
+4. `run_dbt_raw` - dbt raw layer transformation
+5. `validate_raw_with_great_expectations` - Validate raw layer
+6. `run_dbt_bronze` - dbt bronze layer transformation
+7. `validate_bronze_with_great_expectations` - Validate bronze layer
+8. `run_dbt_marts` - dbt marts layer transformation
+9. `validate_marts_with_great_expectations` - Validate marts layer
+10. `run_dbt_tests` - Run dbt data quality tests
+
+#### 6. Stop services:
+```bash
+docker-compose down
+```
+
+---
+
+### Option B: Manual Setup
+
+For development or running individual pipeline components without Docker.
+
+#### 1. Clone the repository:
+```bash
+git clone https://github.com/CoreSheep/company-atlas.git
+cd company-atlas
+```
+
+#### 2. Create and activate conda environment:
+```bash
+conda env create -f environment.yml
+conda activate company-atlas
+```
+
+Or install with pip:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Set up environment variables:
+#### 3. Configure environment variables:
 ```bash
-cp .env.example .env
-# Edit .env with your credentials (Snowflake, AWS, Kaggle)
+# Source environment variables
+source ~/.env
 ```
 
-4. Configure dbt:
+#### 4. Configure dbt:
 ```bash
 cd dbt
 dbt deps
+cd ..
 ```
 
-5. Set up Airflow for workflow orchestration:
+#### 5. Run pipeline steps manually:
+
 ```bash
-# Install Docker and Docker Compose (if not already installed)
-# For macOS: brew install docker docker-compose
-# For Linux: sudo apt-get install docker.io docker-compose
+# Step 1: Download datasets from Kaggle
+python pipelines/ingestion/download_datasets.py
 
-# Initialize Airflow database (first time only)
-docker-compose up airflow-init
-
-# Start Airflow services
-docker-compose up -d
-
-# Access Airflow web UI at http://localhost:8080
-# Default credentials: airflow / airflow
-```
-
-6. Run data pipeline:
-
-**Option A: Using Airflow (Recommended)**
-- Open Airflow web UI at http://localhost:8080
-- Unpause the `company_atlas_pipeline` DAG
-- Trigger the DAG to run the complete pipeline automatically
-
-**Option B: Manual execution**
-```bash
-# Download datasets
-python pipelines/ingestion/main_ingestion.py
-
-# Upload to S3
+# Step 2: Upload to S3
 python pipelines/staging/upload_to_s3.py
 
-# Load to Snowflake
-# Run SQL scripts in pipelines/staging/
+# Step 3: Load to Snowflake staging
+python pipelines/staging/run_load_script.py
 
-# Run dbt models
+# Step 4-5: Run dbt raw layer and tests
 cd dbt
-dbt run
+dbt run --select raw.*
+dbt test --select raw.*
+
+# Step 6-7: Run dbt bronze layer and tests
+dbt run --select bronze.*
+dbt test --select bronze.*
+
+# Step 8-9: Run dbt marts layer and tests
+dbt run --select marts.*
+dbt test --select marts.*
+
+# Step 10: Run all dbt tests
 dbt test
+cd ..
+
+# Optional: Run Great Expectations validation
+python -c "from pipelines.validation.great_expectations_setup import GreatExpectationsValidator; v = GreatExpectationsValidator(); v.validate_all_layers()"
+```
+
+#### 6. Start the API server (optional):
+```bash
+cd api
+uvicorn main:app --reload --port 8000
+# API available at http://localhost:8000
+# Docs at http://localhost:8000/docs
 ```
 
 ## Citation

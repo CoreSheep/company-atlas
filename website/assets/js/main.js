@@ -18,7 +18,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     initMobileMenu();
 });
 
-// Load data from local JSON files
+/**
+ * Loads company data and statistics from local JSON files.
+ * Falls back to API endpoint if local files are not available.
+ * Stores data in window.companiesData and window.datasetStats.
+ * 
+ * @async
+ * @function loadData
+ * @returns {Promise<void>} Resolves when data is loaded or fails silently
+ */
 async function loadData() {
     try {
         // Load companies data
@@ -43,7 +51,14 @@ async function loadData() {
     }
 }
 
-// Load statistics
+/**
+ * Loads and displays statistics on the dashboard.
+ * Updates stat cards with total companies, revenue, industries, and average employees.
+ * 
+ * @async
+ * @function loadStatistics
+ * @returns {Promise<void>} Resolves when statistics are loaded and displayed
+ */
 async function loadStatistics() {
     try {
         const stats = window.datasetStats;
@@ -69,7 +84,14 @@ async function loadStatistics() {
     }
 }
 
-// Load charts
+/**
+ * Initializes and renders all dashboard charts.
+ * Creates industries, revenue, cities, employees, revenue change, and profitability charts.
+ * 
+ * @async
+ * @function loadCharts
+ * @returns {Promise<void>} Resolves when all charts are created
+ */
 async function loadCharts() {
     try {
         const stats = window.datasetStats;
@@ -96,7 +118,16 @@ async function loadCharts() {
     }
 }
 
-// Extract domain from website URL
+/**
+ * Extracts the domain name from a website URL.
+ * Removes protocol, www prefix, path, query strings, and port numbers.
+ * 
+ * @function extractDomain
+ * @param {string|null|undefined} websiteUrl - The full website URL
+ * @returns {string|null} The extracted domain name, or null if invalid
+ * @example
+ * extractDomain('https://www.example.com:8080/path?query=1') // Returns 'example.com'
+ */
 function extractDomain(websiteUrl) {
     if (!websiteUrl) return null;
     try {
@@ -114,7 +145,14 @@ function extractDomain(websiteUrl) {
     }
 }
 
-// Map company names to logo filenames
+/**
+ * Maps company names to their corresponding logo filenames.
+ * Returns the logo filename if found in the predefined mapping, otherwise returns null.
+ * 
+ * @function getCompanyLogo
+ * @param {string|null|undefined} companyName - The company name to look up
+ * @returns {string|null} The logo filename (e.g., 'apple.svg') or null if not found
+ */
 function getCompanyLogo(companyName) {
     const logoMap = {
         'APPLE': 'apple.svg',
@@ -128,7 +166,15 @@ function getCompanyLogo(companyName) {
     return logoMap[normalizedName] || null;
 }
 
-// Load and display company profiles
+/**
+ * Loads and displays the top 6 companies by market cap as profile cards.
+ * Each card shows company logo, name, ticker, market cap, fortune rank, domain,
+ * revenue, employee count, and founded year.
+ * 
+ * @async
+ * @function loadCompanyProfiles
+ * @returns {Promise<void>} Resolves when company profiles are loaded and displayed
+ */
 async function loadCompanyProfiles() {
     try {
         const companies = window.companiesData;
@@ -214,7 +260,14 @@ const CHART_COLORS = {
     neutralDark: '#64748b'    // Slate-500
 };
 
-// Generate color array with same family, different intensities
+/**
+ * Generates a color palette array by cycling through predefined base colors.
+ * Uses OpenAI-style color scheme with green/teal, purple, and violet families.
+ * 
+ * @function getColorPalette
+ * @param {number} count - The number of colors needed
+ * @returns {string[]} Array of hex color codes
+ */
 function getColorPalette(count) {
     const baseColors = [
         CHART_COLORS.primary,
@@ -237,7 +290,14 @@ function getColorPalette(count) {
 
 // Removed createCountriesChart - no longer needed
 
-// Create industries chart
+/**
+ * Creates a bar chart displaying the top 10 industries by company count.
+ * Uses Chart.js to render a vertical bar chart with custom styling.
+ * 
+ * @function createIndustriesChart
+ * @param {Object<string, number>} industriesData - Object mapping industry names to company counts
+ * @returns {void}
+ */
 function createIndustriesChart(industriesData) {
     const canvas = document.getElementById('industries-chart');
     if (!canvas) return;
@@ -300,7 +360,14 @@ function createIndustriesChart(industriesData) {
     });
 }
 
-// Create revenue distribution chart
+/**
+ * Creates a horizontal bar chart showing the top 15 companies by revenue.
+ * Displays revenue in billions of USD with formatted tooltips and labels.
+ * 
+ * @function createRevenueChart
+ * @param {Array<Object>} companiesData - Array of company objects with revenue data
+ * @returns {void}
+ */
 function createRevenueChart(companiesData) {
     const canvas = document.getElementById('revenue-chart');
     if (!canvas) return;
@@ -377,13 +444,33 @@ function createRevenueChart(companiesData) {
     });
 }
 
-// Format number with commas
+/**
+ * Formats a number with locale-specific thousand separators.
+ * Returns '-' for null, undefined, or NaN values.
+ * 
+ * @function formatNumber
+ * @param {number|null|undefined} num - The number to format
+ * @returns {string} Formatted number string with commas, or '-' for invalid values
+ * @example
+ * formatNumber(1234567) // Returns '1,234,567'
+ */
 function formatNumber(num) {
     if (num === null || num === undefined || isNaN(num)) return '-';
     return num.toLocaleString();
 }
 
-// Format currency
+/**
+ * Formats a number as currency with appropriate suffix (K, M, B).
+ * Automatically scales large numbers to thousands, millions, or billions.
+ * Returns '-' for null, undefined, or NaN values.
+ * 
+ * @function formatCurrency
+ * @param {number|null|undefined} num - The currency amount to format
+ * @returns {string} Formatted currency string (e.g., '1.5B', '250.3M', '45.2K'), or '-' for invalid values
+ * @example
+ * formatCurrency(1500000000) // Returns '1.5B'
+ * formatCurrency(250000) // Returns '250.0K'
+ */
 function formatCurrency(num) {
     if (num === null || num === undefined || isNaN(num)) return '-';
     if (num >= 1000000000) {
@@ -396,7 +483,16 @@ function formatCurrency(num) {
     return num.toLocaleString();
 }
 
-// Escape HTML to prevent XSS
+/**
+ * Escapes HTML special characters to prevent XSS attacks.
+ * Converts potentially dangerous characters to their HTML entity equivalents.
+ * 
+ * @function escapeHtml
+ * @param {string|null|undefined} text - The text to escape
+ * @returns {string} Escaped HTML string, or empty string if input is falsy
+ * @example
+ * escapeHtml('<script>alert("xss")</script>') // Returns '&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;'
+ */
 function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
@@ -404,6 +500,16 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+/**
+ * Converts a company name to title case.
+ * Capitalizes the first letter of each word and lowercases the rest.
+ * 
+ * @function capitalizeCompanyName
+ * @param {string|null|undefined} name - The company name to capitalize
+ * @returns {string} Title-cased company name, or empty string if input is falsy
+ * @example
+ * capitalizeCompanyName('APPLE INC') // Returns 'Apple Inc'
+ */
 function capitalizeCompanyName(name) {
     if (!name) return '';
     // Convert to title case: first letter of each word capitalized, rest lowercase
@@ -417,6 +523,14 @@ function capitalizeCompanyName(name) {
 let currentDashboard = 0;
 const totalDashboards = 6; // Combined revenue growth and decline into one chart
 
+/**
+ * Initializes the dashboard carousel navigation.
+ * Creates indicator dots and sets up previous/next button event listeners.
+ * Allows users to navigate between different dashboard views.
+ * 
+ * @function initCarousel
+ * @returns {void}
+ */
 function initCarousel() {
     const prevBtn = document.getElementById('prev-dashboard');
     const nextBtn = document.getElementById('next-dashboard');
@@ -441,6 +555,14 @@ function initCarousel() {
     });
 }
 
+/**
+ * Navigates to a specific dashboard slide by index.
+ * Updates the active state of slides and indicators.
+ * 
+ * @function goToDashboard
+ * @param {number} index - The zero-based index of the dashboard to display
+ * @returns {void}
+ */
 function goToDashboard(index) {
     const slides = document.querySelectorAll('.dashboard-slide');
     const indicators = document.querySelectorAll('.dashboard-indicator');
@@ -456,7 +578,14 @@ function goToDashboard(index) {
     currentDashboard = index;
 }
 
-// Create cities chart
+/**
+ * Creates a bar chart displaying the top 12 cities by company headquarters count.
+ * Counts companies per city and displays them in descending order.
+ * 
+ * @function createCitiesChart
+ * @param {Array<Object>} companiesData - Array of company objects with headquarters_city data
+ * @returns {void}
+ */
 function createCitiesChart(companiesData) {
     const canvas = document.getElementById('cities-chart');
     if (!canvas) return;
@@ -519,7 +648,14 @@ function createCitiesChart(companiesData) {
     });
 }
 
-// Create employees chart
+/**
+ * Creates a doughnut chart showing employee count distribution across ranges.
+ * Groups companies into ranges: 0-10K, 10K-50K, 50K-100K, 100K-200K, and 200K+.
+ * 
+ * @function createEmployeesChart
+ * @param {Array<Object>} companiesData - Array of company objects with employee_count data
+ * @returns {void}
+ */
 function createEmployeesChart(companiesData) {
     const canvas = document.getElementById('employees-chart');
     if (!canvas) return;
@@ -569,7 +705,14 @@ function createEmployeesChart(companiesData) {
     });
 }
 
-// Create revenue change chart
+/**
+ * Creates a horizontal bar chart showing the top 15 companies by revenue percentage change.
+ * Displays companies with the highest revenue growth or decline.
+ * 
+ * @function createRevenueChangeChart
+ * @param {Array<Object>} companiesData - Array of company objects with revenue_percent_change data
+ * @returns {void}
+ */
 function createRevenueChangeChart(companiesData) {
     const canvas = document.getElementById('revenue-change-chart');
     if (!canvas) return;
@@ -631,7 +774,16 @@ function createRevenueChangeChart(companiesData) {
     });
 }
 
-// Create combined revenue growth and decline chart
+/**
+ * Creates a combined bar chart showing revenue growth and decline.
+ * Displays top 20 companies with the highest absolute revenue change.
+ * Uses green colors for growth and red colors for decline.
+ * Excludes the top growth company to better compare others.
+ * 
+ * @function createProfitabilityCharts
+ * @param {Array<Object>} companiesData - Array of company objects with revenue_percent_change data
+ * @returns {void}
+ */
 function createProfitabilityCharts(companiesData) {
     // Get top growth companies (excluding #1 to better compare others)
     const allGrowthCompanies = companiesData
@@ -774,7 +926,14 @@ function createProfitabilityCharts(companiesData) {
     });
 }
 
-// Search functionality
+/**
+ * Initializes the company search functionality.
+ * Sets up event listeners for search input and button.
+ * Searches companies by name or CEO, displaying up to 20 results.
+ * 
+ * @function initSearch
+ * @returns {void}
+ */
 function initSearch() {
     const searchInput = document.getElementById('search-input');
     const searchBtn = document.getElementById('search-btn');
@@ -807,6 +966,15 @@ function initSearch() {
     });
 }
 
+/**
+ * Displays search results in a table format.
+ * Shows company details including name, ticker, CEO, founded year, domain,
+ * industry, headquarters, market cap, revenue, and employee count.
+ * 
+ * @function displaySearchResults
+ * @param {Array<Object>} results - Array of company objects matching the search query
+ * @returns {void}
+ */
 function displaySearchResults(results) {
     const resultsTable = document.getElementById('search-results');
     resultsTable.innerHTML = `
@@ -846,7 +1014,13 @@ function displaySearchResults(results) {
     resultsTable.classList.add('active');
 }
 
-// Logo refresh - go to top of page
+/**
+ * Initializes the logo click handler to scroll to the top of the page.
+ * Provides smooth scrolling behavior when the logo is clicked.
+ * 
+ * @function initLogoRefresh
+ * @returns {void}
+ */
 function initLogoRefresh() {
     const logo = document.getElementById('logo-refresh');
     if (logo) {
@@ -870,7 +1044,14 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Mobile Menu Toggle
+/**
+ * Initializes the mobile menu toggle functionality.
+ * Handles hamburger menu click, link clicks, outside clicks, and Escape key.
+ * Manages ARIA attributes for accessibility.
+ * 
+ * @function initMobileMenu
+ * @returns {void}
+ */
 function initMobileMenu() {
     const hamburger = document.getElementById('hamburger');
     const navMenu = document.getElementById('nav-menu');

@@ -427,4 +427,3 @@ if __name__ == "__main__":
         "founded_year": [2020, 2021]
     })
     result = validator.validate_unified_companies(test_df)
-

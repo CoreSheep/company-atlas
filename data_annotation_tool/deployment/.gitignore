@@ -1,0 +1,26 @@
+# Environment files
+.env
+*.env
+!.env.example
+
+# Infrastructure output
+infrastructure-output.json
+infrastructure-setup.log
+alb-dns.txt
+
+# Backup files
+*.bak
+*.backup
+
+# AWS credentials
+.aws/
+aws-credentials.json
+
+# Deployment logs
+deploy.log
+*.log
+
+# Temporary files
+*.tmp
+temp/
+
